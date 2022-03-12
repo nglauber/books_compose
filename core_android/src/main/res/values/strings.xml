@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Books</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_back">Back</string>
+    <string name="cd_close">Close</string>
+
+    <!-- Menu Actions -->
+    <string name="menu_action_edit">Edit</string>
+    <string name="menu_action_logout">Logout</string>
+    <string name="menu_action_settings">Settings</string>
+
+    <!-- Generic messages -->
+    <string name="msg_generic_error">Ops! Something went wrong…</string>
+    <string name="msg_loading">Please wait…</string>
+
+    <!-- Button Texts -->
+    <string name="button_save">Save</string>
+    <string name="button_ok">OK</string>
+</resources>

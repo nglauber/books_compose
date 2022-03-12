@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="button_google_sign_in">Login com Google</string>
+    <string name="msg_login_error">Fail during login process.</string>
+</resources>

@@ -1,0 +1,8 @@
+<paths>
+    <external-path
+        name="book_images"
+        path="Android/data/com.nglauber.architecture_sample/files/Pictures" />
+    <files-path
+        name="book_images_internal"
+        path="/" />
+</paths>

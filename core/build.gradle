@@ -1,0 +1,13 @@
+plugins {
+    id 'java-library'
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+java {
+    sourceCompatibility = java_compatibility_version
+    targetCompatibility = java_compatibility_version
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+}

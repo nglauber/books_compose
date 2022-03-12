@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text_format_book_pages">Number of pages: %1$d</string>
+    <string name="text_format_book_year">Year of publication: %1$d</string>
+    <string name="text_format_book_publisher">Publisher: %1$s</string>
+    <string name="text_book_available">Available</string>
+    <string name="text_book_unavailable">Unavailable</string>
+
+    <string name="text_book_media_paper">Printed</string>
+    <string name="text_book_media_ebook">E-Book</string>
+
+    <string name="text_book_title">Title</string>
+    <string name="text_book_author">Author</string>
+    <string name="text_book_publisher">Publisher</string>
+    <string name="text_book_pages">Number of pages</string>
+    <string name="text_book_year">Year of publication</string>
+    <string name="text_book_rating">Rating</string>
+    <string name="text_book_media_type">Media Type</string>
+
+    <string name="cd_new_book">Insert new book</string>
+    <string name="msg_empty_books_list">No books registered at the moment</string>
+</resources>
