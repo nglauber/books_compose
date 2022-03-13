@@ -36,7 +36,10 @@ fun NavGraphBuilder.booksGraph(
             BooksList.route,
             targetIsPopup = popupScreens
         ) {
-            val booksListViewModel: BookListViewModel = hiltViewModel()
+            val booksListViewModel = hiltViewModel<BookListViewModel>()
+            LaunchedEffect(auth) {
+                booksListViewModel.authUseCase.auth = auth
+            }
             BookListScreen(
                 booksListViewModel,
                 onNewBookClick = {
@@ -44,9 +47,6 @@ fun NavGraphBuilder.booksGraph(
                 },
                 onBookClick = {
                     router.showBookDetails(it)
-                },
-                onLogoutClick = {
-                    auth.signOut()
                 },
                 onSettingsClick = {
                     router.showSettings()

@@ -39,7 +39,6 @@ import com.nglauber.architecture_sample.core_android.R as CoreR
 fun BookListScreen(
     viewModel: BookListViewModel,
     onNewBookClick: () -> Unit,
-    onLogoutClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onBookClick: (Book) -> Unit
 ) {
@@ -47,7 +46,7 @@ fun BookListScreen(
     BooksListContent(
         booksListState = booksListState,
         onNewBookClick = onNewBookClick,
-        onLogoutClick = onLogoutClick,
+        onLogoutClick = viewModel::logout,
         onSettingsClick = onSettingsClick,
         onBookClick = onBookClick,
         onDeleteBook = viewModel::remove,

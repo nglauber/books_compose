@@ -1,16 +1,15 @@
 package com.nglauber.architecture_sample.login.navigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navigation
 import com.google.accompanist.navigation.animation.composable
 import com.nglauber.architecture_sample.core.auth.Auth
 import com.nglauber.architecture_sample.domain.navigation.Router
 import com.nglauber.architecture_sample.login.ui.LoginScreen
+import com.nglauber.architecture_sample.login.viewmodel.LoginViewModel
 
 @ExperimentalAnimationApi
 fun NavGraphBuilder.loginGraph(
@@ -22,24 +21,14 @@ fun NavGraphBuilder.loginGraph(
         startDestination = LoginScreen.route,
     ) {
         composable(LoginScreen.route) {
-            var showLoginError by rememberSaveable {
-                mutableStateOf(false)
+            val viewModel = hiltViewModel<LoginViewModel>()
+            LaunchedEffect(auth) {
+                viewModel.useCase.auth = auth
             }
             LoginScreen(
-                showLoginError = showLoginError,
-                onDismissLoginError = {
-                    showLoginError = false
-                },
-                onLoginClick = {
-                    auth.signIn(
-                        onSuccess = {
-                            showLoginError = false
-                            router.showBooksList()
-                        },
-                        onError = {
-                            showLoginError = true
-                        }
-                    )
+                viewModel,
+                onLoginSuccess = {
+                    router.showBooksList()
                 }
             )
         }

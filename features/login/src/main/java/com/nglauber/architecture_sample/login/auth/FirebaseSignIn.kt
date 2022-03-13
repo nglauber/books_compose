@@ -38,7 +38,7 @@ class FirebaseSignIn @Inject constructor(
 
     private var onLoginSuccess: (() -> Unit)? = null
 
-    private var onLoginError: (() -> Unit)? = null
+    private var onLoginError: ((Throwable?) -> Unit)? = null
 
     init {
         firebaseAuth.addAuthStateListener(authListener)
@@ -54,7 +54,7 @@ class FirebaseSignIn @Inject constructor(
                     onLoginSuccess?.invoke()
                     onLoginSuccess = null
                 } else {
-                    onLoginError?.invoke()
+                    onLoginError?.invoke(task.exception)
                     onLoginError = null
                 }
             }
@@ -64,7 +64,7 @@ class FirebaseSignIn @Inject constructor(
 
     override fun signIn(
         onSuccess: () -> Unit,
-        onError: () -> Unit,
+        onError: (Throwable?) -> Unit,
         input: Unit?,
     ) {
         onLoginSuccess = onSuccess

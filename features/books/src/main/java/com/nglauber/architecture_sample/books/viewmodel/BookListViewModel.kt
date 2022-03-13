@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nglauber.architecture_sample.core.ResultState
 import com.nglauber.architecture_sample.domain.entities.Book
+import com.nglauber.architecture_sample.domain.usecases.AuthUseCase
 import com.nglauber.architecture_sample.domain.usecases.BookUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BookListViewModel @Inject constructor(
     private val bookUseCase: BookUseCase,
+    val authUseCase: AuthUseCase,
 ) : ViewModel(), LifecycleObserver {
 
     private val _booksListState = MutableStateFlow<ResultState<List<Book>>>(ResultState.Loading)
@@ -41,5 +43,9 @@ class BookListViewModel @Inject constructor(
                 _removeBookState.value = it
             }
         }
+    }
+
+    fun logout() {
+        authUseCase.logout()
     }
 }

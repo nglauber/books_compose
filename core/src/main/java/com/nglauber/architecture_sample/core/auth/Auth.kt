@@ -7,7 +7,7 @@ abstract class Auth<Input, Result> {
 
     abstract fun signIn(
         onSuccess: () -> Unit,
-        onError: () -> Unit,
+        onError: (t: Throwable?) -> Unit,
         input: Input? = null,
     )
 
