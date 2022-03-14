@@ -1,9 +1,8 @@
 package com.nglauber.architecture_sample.core
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 
 sealed class ResultState<out T> {
 
@@ -17,14 +16,17 @@ sealed class ResultState<out T> {
     ) : ResultState<Nothing>()
 
     companion object {
-        fun <T> flowRequest(block: suspend () -> T): Flow<ResultState<T>> {
+        fun <T> flowRequest(
+            dispatcher: CoroutineDispatcher = Dispatchers.Main,
+            block: suspend () -> T
+        ): Flow<ResultState<T>> {
             return flow {
                 emit(Loading)
                 val result = block()
                 emit(Success(result))
             }.catch {
                 emit(Error(ErrorEntity(it)))
-            }
+            }.flowOn(dispatcher)
         }
 
         fun <T> flowMap(block: () -> Flow<ResultState<T>>): Flow<ResultState<T>> {

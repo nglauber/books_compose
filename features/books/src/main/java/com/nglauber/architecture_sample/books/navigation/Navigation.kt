@@ -1,6 +1,7 @@
 package com.nglauber.architecture_sample.books.navigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -18,6 +19,7 @@ import com.nglauber.architecture_sample.core_android.ui.navigation.composablePop
 import com.nglauber.architecture_sample.core_android.ui.navigation.composableScreen
 import com.nglauber.architecture_sample.domain.navigation.Router
 
+@ExperimentalFoundationApi
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi

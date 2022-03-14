@@ -22,7 +22,7 @@ class BookListViewModel @Inject constructor(
     private val _booksListState = MutableStateFlow<ResultState<List<Book>>>(ResultState.Loading)
     val booksListState = _booksListState.asStateFlow()
 
-    private val _removeBookState = MutableStateFlow<ResultState<Unit>>(ResultState.Loading)
+    private val _removeBookState = MutableStateFlow<ResultState<Unit>?>(null)
     val removeBookState = _removeBookState.asStateFlow()
 
     init {
@@ -43,6 +43,10 @@ class BookListViewModel @Inject constructor(
                 _removeBookState.value = it
             }
         }
+    }
+
+    fun resetRemoveBookState() {
+        _removeBookState.value = null
     }
 
     fun logout() {

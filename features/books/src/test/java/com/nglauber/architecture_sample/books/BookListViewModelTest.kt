@@ -1,8 +1,10 @@
 package com.nglauber.architecture_sample.books
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.nglauber.architecture_sample.books.viewmodel.BookListViewModel
 import com.nglauber.architecture_sample.core.ResultState
 import com.nglauber.architecture_sample.domain.entities.Book
+import com.nglauber.architecture_sample.domain.usecases.AuthUseCase
 import com.nglauber.architecture_sample.domain.usecases.BookUseCase
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -26,6 +28,7 @@ class BookListViewModelTest {
 
     private lateinit var dummyBookList: MutableList<Book>
     private val useCase: BookUseCase = mockk()
+    private val authUseCase: AuthUseCase = mockk()
 
     @Before
     fun setup() {
@@ -52,7 +55,7 @@ class BookListViewModelTest {
     fun `loading books successfully`() = runTest {
         // Given
         val states = mutableListOf<ResultState<List<Book>>>()
-        val viewModel = com.nglauber.architecture_sample.books.viewmodel.BookListViewModel(useCase)
+        val viewModel = BookListViewModel(useCase, authUseCase)
         // When
         val job = launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.booksListState.toList(states)
@@ -72,9 +75,9 @@ class BookListViewModelTest {
     fun `removing a book successfully`() = runTest {
         // Given
         val firstBook = dummyBookList.first()
-        val viewModel = com.nglauber.architecture_sample.books.viewmodel.BookListViewModel(useCase)
+        val viewModel = BookListViewModel(useCase, authUseCase)
         val loadStates = mutableListOf<ResultState<List<Book>>>()
-        val removeStates = mutableListOf<ResultState<Unit>>()
+        val removeStates = mutableListOf<ResultState<Unit>?>()
         // When
         val jobRemoveBook = launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.removeBookState.toList(removeStates)
@@ -86,8 +89,8 @@ class BookListViewModelTest {
         viewModel.loadBooks()
         runCurrent()
         // Then
-        assert(removeStates.first() is ResultState.Loading)
-        assert(removeStates.last() is ResultState.Success)
+        assert(removeStates.filterNotNull().first() is ResultState.Loading)
+        assert(removeStates.filterNotNull().last() is ResultState.Success)
         assert(loadStates.first() is ResultState.Loading)
         assert(loadStates.last() is ResultState.Success)
         val loadedListAfterDeletion = (loadStates.last() as ResultState.Success).data

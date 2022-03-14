@@ -1,10 +1,12 @@
 package com.nglauber.architecture_sample.books.screens
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -15,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,8 +35,12 @@ import com.nglauber.architecture_sample.core_android.ui.theme.custom.AppTheme
 import com.nglauber.architecture_sample.domain.entities.Book
 import de.charlex.compose.RevealDirection
 import de.charlex.compose.RevealSwipe
+import de.charlex.compose.RevealValue
+import de.charlex.compose.rememberRevealState
+import kotlinx.coroutines.launch
 import com.nglauber.architecture_sample.core_android.R as CoreR
 
+@ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
 fun BookListScreen(
@@ -43,63 +50,89 @@ fun BookListScreen(
     onBookClick: (Book) -> Unit
 ) {
     val booksListState by viewModel.booksListState.collectAsState()
+    val removeBookState by viewModel.removeBookState.collectAsState()
     BooksListContent(
         booksListState = booksListState,
+        removeBookState = removeBookState,
         onNewBookClick = onNewBookClick,
         onLogoutClick = viewModel::logout,
         onSettingsClick = onSettingsClick,
         onBookClick = onBookClick,
         onDeleteBook = viewModel::remove,
+        onDeleteBookConfirmed = viewModel::resetRemoveBookState,
         reloadBooks = viewModel::loadBooks
     )
 }
 
+@ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
 private fun BooksListContent(
     booksListState: ResultState<List<Book>>,
+    removeBookState: ResultState<Unit>?,
     onNewBookClick: () -> Unit,
     onLogoutClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onBookClick: (Book) -> Unit,
     onDeleteBook: (Book) -> Unit,
+    onDeleteBookConfirmed: () -> Unit,
     reloadBooks: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val scaffoldState = rememberScaffoldState()
     var menuExpanded by remember { mutableStateOf(false) }
-    Scaffold(topBar = {
-        TopAppBar(title = {
-            Text(text = stringResource(CoreR.string.app_name))
-        }, actions = {
-            IconButton(onClick = { menuExpanded = !menuExpanded }) {
-                Icon(Icons.Filled.MoreVert, "More options")
-                DropdownMenu(expanded = menuExpanded, onDismissRequest = {
-                    menuExpanded = false
-                }, content = {
-                    DropdownMenuItem(onClick = {
-                        menuExpanded = false
-                        onSettingsClick()
-                    }, content = {
-                        Text(stringResource(CoreR.string.menu_action_settings))
-                    })
-                    DropdownMenuItem(onClick = {
-                        menuExpanded = false
-                        onLogoutClick()
-                    }, content = {
-                        Text(stringResource(CoreR.string.menu_action_logout))
-                    })
-                })
-            }
-        })
-    }, floatingActionButton = {
-        FloatingActionButton(onClick = onNewBookClick) {
-            Icon(
-                imageVector = ImageVector.vectorResource(id = CoreR.drawable.ic_add),
-                contentDescription = stringResource(
-                    id = R.string.cd_new_book
+
+    if (removeBookState is ResultState.Success) {
+        LaunchedEffect(removeBookState) {
+            coroutineScope.launch {
+                scaffoldState.snackbarHostState.showSnackbar(
+                    message = context.getString(R.string.msg_book_deleted),
                 )
-            )
+                onDeleteBookConfirmed()
+            }
         }
-    }) {
+    }
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = stringResource(CoreR.string.app_name))
+                },
+                actions = {
+                    IconButton(onClick = { menuExpanded = !menuExpanded }) {
+                        Icon(Icons.Filled.MoreVert, "More options")
+                        DropdownMenu(expanded = menuExpanded, onDismissRequest = {
+                            menuExpanded = false
+                        }, content = {
+                            DropdownMenuItem(onClick = {
+                                menuExpanded = false
+                                onSettingsClick()
+                            }, content = {
+                                Text(stringResource(CoreR.string.menu_action_settings))
+                            })
+                            DropdownMenuItem(onClick = {
+                                menuExpanded = false
+                                onLogoutClick()
+                            }, content = {
+                                Text(stringResource(CoreR.string.menu_action_logout))
+                            })
+                        })
+                    }
+                })
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onNewBookClick) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = CoreR.drawable.ic_add),
+                    contentDescription = stringResource(
+                        id = R.string.cd_new_book
+                    )
+                )
+            }
+        }
+    ) {
         AsyncData(resultState = booksListState, errorContent = {
             GenericError(
                 onDismissAction = reloadBooks
@@ -114,7 +147,7 @@ private fun BooksListContent(
                         EmptyList()
                     } else {
                         LazyColumn {
-                            items(booksList) { item ->
+                            items(booksList, key = { it.id }) { item ->
                                 BookItem(
                                     book = item,
                                     onBookClick = onBookClick,
@@ -129,17 +162,28 @@ private fun BooksListContent(
     }
 }
 
+@ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun BookItem(
+fun LazyItemScope.BookItem(
     book: Book,
     onBookClick: (Book) -> Unit,
     onDeleteBook: (Book) -> Unit,
 ) {
-    RevealSwipe(backgroundCardModifier = Modifier.padding(8.dp),
+    val coroutineScope = rememberCoroutineScope()
+    val revealState = rememberRevealState()
+    RevealSwipe(
+        modifier = Modifier.animateItemPlacement(),
+        backgroundCardModifier = Modifier.padding(8.dp),
+        state = revealState,
         directions = setOf(RevealDirection.EndToStart),
         hiddenContentEnd = {
-            IconButton(onClick = { onDeleteBook(book) }) {
+            IconButton(onClick = {
+                coroutineScope.launch {
+                    onDeleteBook(book)
+                    revealState.snapTo(RevealValue.Default)
+                }
+            }) {
                 Icon(
                     modifier = Modifier.padding(horizontal = 25.dp),
                     imageVector = Icons.Outlined.Delete,
@@ -208,6 +252,7 @@ fun EmptyList() {
     }
 }
 
+@ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Preview(showBackground = true)
 @Composable
@@ -217,11 +262,13 @@ private fun PreviewBookListContent() {
             booksListState = ResultState.Success(
                 listOf(bookForUiPreview())
             ),
+            removeBookState = null,
             onNewBookClick = {},
             onLogoutClick = {},
             onSettingsClick = {},
             onBookClick = {},
             onDeleteBook = {},
+            onDeleteBookConfirmed = {},
             reloadBooks = {},
         )
     }

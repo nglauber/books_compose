@@ -1,6 +1,7 @@
 package com.nglauber.architecture_sample.ui.navigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -12,6 +13,7 @@ import com.nglauber.architecture_sample.login.navigation.loginGraph
 import com.nglauber.architecture_sample.settings.navigation.settingsGraph
 import com.nglauber.architecture_sample.viewmodel.MainViewModel
 
+@ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
 @ExperimentalAnimationApi

@@ -16,6 +16,7 @@ import com.nglauber.architecture_sample.core.ResultState
 import com.nglauber.architecture_sample.core.ResultState.Companion.flowRequest
 import com.nglauber.architecture_sample.domain.entities.Book
 import com.nglauber.architecture_sample.domain.repositories.BooksRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -23,7 +24,6 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
-
 
 class FirebaseBookRepository : BooksRepository {
 
@@ -135,7 +135,9 @@ class FirebaseBookRepository : BooksRepository {
     }
 
     override fun remove(book: Book): Flow<ResultState<Unit>> {
-        return flowRequest {
+        return flowRequest(
+            dispatcher = Dispatchers.IO
+        ) {
             val db = firestore
             val deleteBookTask = db.collection(BOOKS_KEY)
                 .document(book.id)

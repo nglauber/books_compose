@@ -19,4 +19,6 @@
 
     <string name="cd_new_book">Insert new book</string>
     <string name="msg_empty_books_list">No books registered at the moment</string>
+
+    <string name="msg_book_deleted">Book deleted.</string>
 </resources>
