@@ -20,9 +20,3 @@ object AppTheme {
         @ReadOnlyComposable
         get() = LocalAppShapes.current
 }
-
-enum class ThemeMode {
-    MODE_SYSTEM,
-    MODE_LIGHT,
-    MODE_DARK
-}

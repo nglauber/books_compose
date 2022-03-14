@@ -1,6 +1,7 @@
 package com.nglauber.architecture_sample.di
 
 import android.content.Context
+import com.nglauber.architecture_sample.core.theme.ThemeManager
 import com.nglauber.architecture_sample.core_android.files.FilePicker
 import com.nglauber.architecture_sample.core_android.ui.theme.DarkModeManager
 import dagger.Module
@@ -30,6 +31,14 @@ class HelperModuleSingleton {
     fun providesDarkModeManager(
         @ApplicationContext context: Context,
     ): DarkModeManager {
+        return DarkModeManager(context)
+    }
+
+    @Singleton
+    @Provides
+    fun providesThemeManager(
+        @ApplicationContext context: Context
+    ): ThemeManager {
         return DarkModeManager(context)
     }
 }

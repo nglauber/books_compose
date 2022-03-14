@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import com.nglauber.architecture_sample.core_android.ui.theme.custom.ThemeMode
+import com.nglauber.architecture_sample.core.theme.ThemeMode
 import com.nglauber.architecture_sample.settings.R
 import com.nglauber.architecture_sample.settings.viewmodel.SettingsViewModel
 import com.nglauber.architecture_sample.core_android.R as CoreR

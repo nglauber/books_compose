@@ -3,28 +3,29 @@ package com.nglauber.architecture_sample.core_android.ui.theme
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate.*
+import com.nglauber.architecture_sample.core.theme.ThemeManager
+import com.nglauber.architecture_sample.core.theme.ThemeMode
 import com.nglauber.architecture_sample.core_android.preferences.PreferenceUtil
 import com.nglauber.architecture_sample.core_android.preferences.PreferenceUtil.set
-import com.nglauber.architecture_sample.core_android.ui.theme.custom.ThemeMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class DarkModeManager(
     context: Context
-) {
+) : ThemeManager {
     private val preferences: SharedPreferences =
         PreferenceUtil.customPrefs(context, PREF_NAME)
 
     private val _themeMode = MutableStateFlow(getThemeFromPreferences())
-    val themeMode: StateFlow<ThemeMode> = _themeMode.asStateFlow()
+    override val themeMode: StateFlow<ThemeMode> = _themeMode.asStateFlow()
 
     private fun getThemeFromPreferences(): ThemeMode {
         val ordinal = preferences.getInt(KEY_THEME_MODE, ThemeMode.MODE_SYSTEM.ordinal)
         return ThemeMode.values()[ordinal]
     }
 
-    fun setTheme(theme: ThemeMode) {
+    override fun setTheme(theme: ThemeMode) {
         setDefaultNightMode(
             when (theme) {
                 ThemeMode.MODE_SYSTEM -> MODE_NIGHT_FOLLOW_SYSTEM
@@ -36,7 +37,7 @@ class DarkModeManager(
         _themeMode.value = theme
     }
 
-    fun isDark(theme: ThemeMode): Boolean? {
+    override fun isDark(theme: ThemeMode): Boolean? {
         return when (theme) {
             ThemeMode.MODE_SYSTEM -> null
             ThemeMode.MODE_LIGHT -> false

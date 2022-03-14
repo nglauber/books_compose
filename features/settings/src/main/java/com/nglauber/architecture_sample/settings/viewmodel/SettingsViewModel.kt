@@ -1,19 +1,19 @@
 package com.nglauber.architecture_sample.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.nglauber.architecture_sample.core_android.ui.theme.DarkModeManager
-import com.nglauber.architecture_sample.core_android.ui.theme.custom.ThemeMode
+import com.nglauber.architecture_sample.core.theme.ThemeMode
+import com.nglauber.architecture_sample.domain.usecases.ThemeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val darkModeManager: DarkModeManager
+    private val themeUseCase: ThemeUseCase
 ) : ViewModel() {
 
-    val currentTheme = darkModeManager.themeMode
+    val currentTheme = themeUseCase.themeMode
 
     fun setTheme(theme: ThemeMode) {
-        darkModeManager.setTheme(theme = theme)
+        themeUseCase.setTheme(theme = theme)
     }
 }
