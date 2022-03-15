@@ -190,7 +190,8 @@ fun LazyItemScope.BookItem(
                     contentDescription = null
                 )
             }
-        }) {
+        }
+    ) {
         Card(
             Modifier
                 .fillMaxWidth()

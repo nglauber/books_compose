@@ -72,11 +72,6 @@ fun BookFormScreen(
         ) {
             viewModel.currentBook?.let { book ->
                 val bookSaveState by viewModel.saveBookState.collectAsState()
-                if (bookSaveState is ResultState.Success) {
-                    LaunchedEffect(it) {
-                        onBookSaved()
-                    }
-                }
                 AsyncData(
                     resultState = bookSaveState,
                     errorContent = {
@@ -85,23 +80,29 @@ fun BookFormScreen(
                         )
                     }
                 ) {
-                    BookFormScreenContent(
-                        book = book,
-                        onTitleChanged = viewModel::setTitle,
-                        onAuthorChanged = viewModel::setAuthor,
-                        onPagesChanged = viewModel::setPages,
-                        onYearChanged = viewModel::setYear,
-                        onAvailabilityChange = viewModel::setAvailable,
-                        onRatingChanged = viewModel::setRating,
-                        onMediaTypeChanged = viewModel::setMediaType,
-                        publishers = viewModel.publishers,
-                        onPublisherChanged = viewModel::setPublisher,
-                        onCreateCoverImageUri = viewModel::createTempImageFile,
-                        onConfirmCoverImage = viewModel::assignCoverImage,
-                        onDeleteCoverImage = { viewModel.setCoverImageUri("") },
-                        isFormValid = formValidationState,
-                        onSaveClick = viewModel::saveBook
-                    )
+                    if (bookSaveState is ResultState.Success) {
+                        LaunchedEffect(bookSaveState) {
+                            onBookSaved()
+                        }
+                    } else {
+                        BookFormScreenContent(
+                            book = book,
+                            onTitleChanged = viewModel::setTitle,
+                            onAuthorChanged = viewModel::setAuthor,
+                            onPagesChanged = viewModel::setPages,
+                            onYearChanged = viewModel::setYear,
+                            onAvailabilityChange = viewModel::setAvailable,
+                            onRatingChanged = viewModel::setRating,
+                            onMediaTypeChanged = viewModel::setMediaType,
+                            publishers = viewModel.publishers,
+                            onPublisherChanged = viewModel::setPublisher,
+                            onCreateCoverImageUri = viewModel::createTempImageFile,
+                            onConfirmCoverImage = viewModel::assignCoverImage,
+                            onDeleteCoverImage = { viewModel.setCoverImageUri("") },
+                            isFormValid = formValidationState,
+                            onSaveClick = viewModel::saveBook
+                        )
+                    }
                 }
             }
         }

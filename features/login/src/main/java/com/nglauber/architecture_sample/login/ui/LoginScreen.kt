@@ -40,14 +40,15 @@ fun LoginScreen(
             )
         }
     ) { state ->
-        LaunchedEffect(state) {
-            if (state != null) {
+        if (state != null) {
+            LaunchedEffect(state) {
                 onLoginSuccess()
             }
+        } else {
+            LoginScreenContent(
+                onLoginClick = viewModel::login
+            )
         }
-        LoginScreenContent(
-            onLoginClick = viewModel::login
-        )
     }
 }
 
