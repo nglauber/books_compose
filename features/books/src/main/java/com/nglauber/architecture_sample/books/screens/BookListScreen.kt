@@ -1,12 +1,15 @@
 package com.nglauber.architecture_sample.books.screens
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -15,6 +18,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -165,7 +169,57 @@ private fun BooksListContent(
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun LazyItemScope.BookItem(
+fun BookItem(
+    book: Book,
+    onBookClick: (Book) -> Unit,
+    onDeleteBook: (Book) -> Unit,
+) {
+    val scope = rememberCoroutineScope()
+    // Animation to slide out the component
+    val translateXAnim = remember(book.id) {
+        Animatable(0f)
+    }
+    var markedAsDeleted by remember(book.id) {
+        mutableStateOf(false)
+    }
+    BoxWithConstraints(
+        modifier = Modifier
+            .graphicsLayer {
+                translationX = translateXAnim.value
+            }
+            .animateContentSize(
+                animationSpec = tween(100, easing = LinearEasing),
+                finishedListener = { _, _ ->
+                    if (markedAsDeleted) {
+                        onDeleteBook(book)
+                    }
+                }
+            )
+            .then(
+                if (markedAsDeleted) Modifier.height(height = 0.dp)
+                else Modifier.wrapContentSize()
+            )
+    ) {
+        BookItemContent(
+            book = book,
+            onBookClick = onBookClick,
+            onDeleteBook = {
+                scope.launch {
+                    translateXAnim.animateTo(
+                        targetValue = constraints.maxWidth.toFloat(),
+                        animationSpec = tween(300)
+                    )
+                    markedAsDeleted = true
+                }
+            }
+        )
+    }
+}
+
+@ExperimentalFoundationApi
+@ExperimentalMaterialApi
+@Composable
+fun BookItemContent(
     book: Book,
     onBookClick: (Book) -> Unit,
     onDeleteBook: (Book) -> Unit,
@@ -173,7 +227,6 @@ fun LazyItemScope.BookItem(
     val coroutineScope = rememberCoroutineScope()
     val revealState = rememberRevealState()
     RevealSwipe(
-        modifier = Modifier.animateItemPlacement(),
         backgroundCardModifier = Modifier.padding(8.dp),
         state = revealState,
         directions = setOf(RevealDirection.EndToStart),
