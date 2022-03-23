@@ -70,8 +70,7 @@ class BookFormViewModelTest {
     @Test
     fun `updating fields update book`() = runTest {
         // Given
-        val viewModel = BookFormViewModel(useCase, filePicker)
-        viewModel.createNewBook()
+        val viewModel = BookFormViewModel(useCase, filePicker, null)
         val initialBook: Book = viewModel.currentBook!!
         var currentBook: Book? = initialBook
         val job = launch {
@@ -129,8 +128,7 @@ class BookFormViewModelTest {
     @Test
     fun `insert a book successfully`() = runTest {
         // Given
-        val viewModel = BookFormViewModel(useCase, filePicker)
-        viewModel.createNewBook()
+        val viewModel = BookFormViewModel(useCase, filePicker, null)
         val dummyBook = viewModel.currentBook
 
         val saveStates = mutableListOf<ResultState<Unit>?>()
