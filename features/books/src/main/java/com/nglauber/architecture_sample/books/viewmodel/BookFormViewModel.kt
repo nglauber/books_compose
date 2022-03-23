@@ -3,6 +3,7 @@ package com.nglauber.architecture_sample.books.viewmodel
 import android.net.Uri
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.nglauber.architecture_sample.core.ResultState
 import com.nglauber.architecture_sample.core_android.files.FilePicker
@@ -10,19 +11,20 @@ import com.nglauber.architecture_sample.domain.entities.Book
 import com.nglauber.architecture_sample.domain.entities.MediaType
 import com.nglauber.architecture_sample.domain.entities.Publisher
 import com.nglauber.architecture_sample.domain.usecases.BookUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
-import javax.inject.Inject
 
-@HiltViewModel
-class BookFormViewModel @Inject constructor(
+class BookFormViewModel @AssistedInject constructor(
     private val bookUseCase: BookUseCase,
     private val filePicker: FilePicker,
+    @Assisted private val bookId: String?,
 ) : ViewModel(), LifecycleObserver {
 
     // controls if the image file must be deleted after the screen is closed
@@ -66,11 +68,11 @@ class BookFormViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    // Helper function just to avoid expose currentBook setter
-    fun createNewBook() {
-        currentBook = Book()
+        if (bookId == null) {
+            currentBook = Book()
+        } else {
+            loadBook(bookId)
+        }
     }
 
     fun loadBook(bookId: String) {
@@ -251,5 +253,22 @@ class BookFormViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         deleteTempPhoto()
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(bookId: String?): BookFormViewModel
+    }
+
+    companion object {
+        @Suppress("UNCHECKED_CAST")
+        fun provideFactory(
+            assistedFactory: Factory,
+            bookId: String?
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return assistedFactory.create(bookId) as T
+            }
+        }
     }
 }

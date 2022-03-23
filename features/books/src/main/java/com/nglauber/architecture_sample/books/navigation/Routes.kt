@@ -23,14 +23,15 @@ object BookDetails : AppRoutes("BookDetails") {
 }
 
 object BookForm : AppRoutes("BookForm") {
-    const val paramBookId = "bookId"
-    const val paramNewBook = "newBook"
-    override val route: String = "$baseRoute/{$paramBookId}"
+    private const val paramBookId = "bookId"
+    override val route: String = "$baseRoute?$paramBookId={$paramBookId}"
     val navArguments = listOf(
         navArgument(paramBookId) {
             type = NavType.StringType
+            nullable = true
         }
     )
 
-    fun buildBookDetailsRoute(id: String?) = "$baseRoute/${id ?: paramNewBook}"
+    fun buildBookDetailsRoute(id: String?) =
+        id?.let { "$baseRoute?$paramBookId=$id" } ?: baseRoute
 }
