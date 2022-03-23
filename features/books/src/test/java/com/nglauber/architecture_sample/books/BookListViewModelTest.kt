@@ -12,6 +12,7 @@ import io.mockk.slot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.*
@@ -58,7 +59,11 @@ class BookListViewModelTest {
         val viewModel = BookListViewModel(useCase, authUseCase)
         // When
         val job = launch(UnconfinedTestDispatcher(testScheduler)) {
-            viewModel.booksListState.toList(states)
+            viewModel.uiState
+                .map {
+                    it.bookListState
+                }
+                .toList(states)
         }
         viewModel.loadBooks()
         runCurrent()
@@ -80,10 +85,14 @@ class BookListViewModelTest {
         val removeStates = mutableListOf<ResultState<Unit>?>()
         // When
         val jobRemoveBook = launch(UnconfinedTestDispatcher(testScheduler)) {
-            viewModel.removeBookState.toList(removeStates)
+            viewModel.uiState
+                .map { it.removeBookState }
+                .toList(removeStates)
         }
         val jobListBooks = launch(UnconfinedTestDispatcher(testScheduler)) {
-            viewModel.booksListState.toList(loadStates)
+            viewModel.uiState
+                .map { it.bookListState }
+                .toList(loadStates)
         }
         viewModel.remove(firstBook)
         viewModel.loadBooks()

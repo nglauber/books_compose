@@ -46,8 +46,7 @@ fun BookFormScreen(
     onBookSaved: () -> Unit,
     onBackPressed: () -> Unit,
 ) {
-    val bookDetailsState by viewModel.booksDetailsState.collectAsState()
-    val formValidationState by viewModel.areAllFieldsValid.collectAsState()
+    val bookFormUiState by viewModel.uiState.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -68,20 +67,19 @@ fun BookFormScreen(
         }
     ) {
         AsyncData(
-            resultState = bookDetailsState,
+            resultState = bookFormUiState.bookDetailsState,
         ) {
             viewModel.currentBook?.let { book ->
-                val bookSaveState by viewModel.saveBookState.collectAsState()
                 AsyncData(
-                    resultState = bookSaveState,
+                    resultState = bookFormUiState.saveBookState,
                     errorContent = {
                         GenericError(
                             onDismissAction = viewModel::resetSaveState
                         )
                     }
                 ) {
-                    if (bookSaveState is ResultState.Success) {
-                        LaunchedEffect(bookSaveState) {
+                    if (bookFormUiState.saveBookState is ResultState.Success) {
+                        LaunchedEffect(bookFormUiState.saveBookState) {
                             onBookSaved()
                         }
                     } else {
@@ -94,12 +92,12 @@ fun BookFormScreen(
                             onAvailabilityChange = viewModel::setAvailable,
                             onRatingChanged = viewModel::setRating,
                             onMediaTypeChanged = viewModel::setMediaType,
-                            publishers = viewModel.publishers,
+                            publishers = bookFormUiState.publishers,
                             onPublisherChanged = viewModel::setPublisher,
                             onCreateCoverImageUri = viewModel::createTempImageFile,
                             onConfirmCoverImage = viewModel::assignCoverImage,
                             onDeleteCoverImage = { viewModel.setCoverImageUri("") },
-                            isFormValid = formValidationState,
+                            isFormValid = bookFormUiState.areAllFieldsValid,
                             onSaveClick = viewModel::saveBook
                         )
                     }

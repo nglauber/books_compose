@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.*
@@ -58,6 +59,7 @@ class BookFormViewModelTest {
             emit(ResultState.Loading)
             emit(ResultState.Success(dummyPublishers))
         }
+        coEvery { useCase.isBookValid(any()) } returns true
     }
 
     @After
@@ -73,9 +75,10 @@ class BookFormViewModelTest {
         val initialBook: Book = viewModel.currentBook!!
         var currentBook: Book? = initialBook
         val job = launch {
-            viewModel.booksDetailsState.collect {
-                if (it is ResultState.Success)
-                    currentBook = it.data
+            viewModel.uiState.collect {
+                val bookDetailsState = it.bookDetailsState
+                if (bookDetailsState is ResultState.Success)
+                    currentBook = bookDetailsState.data
             }
         }
         // When
@@ -133,7 +136,9 @@ class BookFormViewModelTest {
         val saveStates = mutableListOf<ResultState<Unit>?>()
         // When
         val jobSaveBook = launch(UnconfinedTestDispatcher(testScheduler)) {
-            viewModel.saveBookState.filter { it != null }
+            viewModel.uiState
+                .map { it.saveBookState }
+                .filter { it != null }
                 .toList(saveStates) // initial state is null
         }
         viewModel.saveBook()

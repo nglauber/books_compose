@@ -53,11 +53,10 @@ fun BookListScreen(
     onSettingsClick: () -> Unit,
     onBookClick: (Book) -> Unit
 ) {
-    val booksListState by viewModel.booksListState.collectAsState()
-    val removeBookState by viewModel.removeBookState.collectAsState()
+    val booksListUiState by viewModel.uiState.collectAsState()
     BooksListContent(
-        booksListState = booksListState,
-        removeBookState = removeBookState,
+        booksListState = booksListUiState.bookListState,
+        removeBookState = booksListUiState.removeBookState,
         onNewBookClick = onNewBookClick,
         onLogoutClick = viewModel::logout,
         onSettingsClick = onSettingsClick,

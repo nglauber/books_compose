@@ -11,7 +11,10 @@ import com.nglauber.architecture_sample.domain.entities.MediaType
 import com.nglauber.architecture_sample.domain.entities.Publisher
 import com.nglauber.architecture_sample.domain.usecases.BookUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -32,39 +35,34 @@ class BookFormViewModel @Inject constructor(
     // It is used to check if the cover image must be deleted
     private var loadedBook: Book? = null
 
-    var publishers: List<Publisher> = emptyList()
-        private set
+    // Keep tracking of the jobs
+    private var loadBookJob: Job? = null
+    private var saveBookJob: Job? = null
 
-    private val _booksDetailsState = MutableStateFlow<ResultState<Book?>>(ResultState.Loading)
-    val booksDetailsState = _booksDetailsState.asStateFlow()
-
-    private val _saveBookState = MutableStateFlow<ResultState<Unit>?>(null)
-    val saveBookState = _saveBookState.asStateFlow()
-
-    val areAllFieldsValid: StateFlow<Boolean> = _booksDetailsState
-        .map { bookState ->
-            if (bookState is ResultState.Success)
-                bookState.data?.let { bookUseCase.isBookValid(it) } ?: false
-            else false
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+    private val _uiState = MutableStateFlow(BookFormUiState())
+    val uiState = _uiState.asStateFlow()
 
     // Helper property to access the book object loaded from the repository
     var currentBook: Book?
         get() {
-            return _booksDetailsState.value.let {
+            return _uiState.value.bookDetailsState.let {
                 if (it is ResultState.Success) it.data else null
             }
         }
         private set(value) {
-            _booksDetailsState.value = ResultState.Success(value)
+            _uiState.update {
+                it.copy(bookDetailsState = ResultState.Success(value))
+            }
+            validateFields()
         }
 
     init {
         viewModelScope.launch {
             bookUseCase.listPublishers().collect { publishersState ->
                 if (publishersState is ResultState.Success) {
-                    publishers = publishersState.data
+                    _uiState.update {
+                        it.copy(publishers = publishersState.data)
+                    }
                 }
             }
         }
@@ -77,30 +75,42 @@ class BookFormViewModel @Inject constructor(
 
     fun loadBook(bookId: String) {
         if (bookId == currentBook?.id) return
-        viewModelScope.launch {
+        loadBookJob?.cancel()
+        loadBookJob = viewModelScope.launch {
             bookUseCase.loadBookDetails(bookId).collect { bookState ->
-                _booksDetailsState.value = bookState
-                if (bookState is ResultState.Success) {
-                    loadedBook = bookState.data
-                    currentBook = bookState.data
+                _uiState.update {
+                    val newState = it.copy(
+                        bookDetailsState = bookState
+                    )
+                    if (bookState is ResultState.Success) {
+                        loadedBook = bookState.data
+                        currentBook = bookState.data
+                    }
+                    newState
                 }
+
             }
         }
     }
 
     // This function is used to dismiss the error message during the saving process.
     fun resetSaveState() {
-        _saveBookState.value = null
+        _uiState.update {
+            it.copy(saveBookState = null)
+        }
     }
 
     fun saveBook() {
-        val state = _booksDetailsState.value
+        val state = _uiState.value.bookDetailsState
         if (state is ResultState.Success) {
             state.data?.let { book ->
-                viewModelScope.launch {
-                    bookUseCase.saveBook(book).collect {
-                        _saveBookState.value = it
-                        if (it is ResultState.Success) {
+                saveBookJob?.cancel()
+                saveBookJob = viewModelScope.launch {
+                    bookUseCase.saveBook(book).collect { saveBookState ->
+                        _uiState.update {
+                            it.copy(saveBookState = saveBookState)
+                        }
+                        if (saveBookState is ResultState.Success) {
                             mustDeleteCoverImage = false
                             deletePreviousCoverImage()
                         }
@@ -113,10 +123,12 @@ class BookFormViewModel @Inject constructor(
     //region Update field functions
     fun setTitle(title: String) {
         currentBook = currentBook?.copy(title = title)
+        validateFields()
     }
 
     fun setAuthor(author: String) {
         currentBook = currentBook?.copy(author = author)
+        validateFields()
     }
 
     fun setCoverUrl(coverUrl: String) {
@@ -136,6 +148,7 @@ class BookFormViewModel @Inject constructor(
             0
         }
         currentBook = currentBook?.copy(pages = newValue)
+        validateFields()
     }
 
     fun setYear(year: String) {
@@ -151,26 +164,45 @@ class BookFormViewModel @Inject constructor(
             0
         }
         currentBook = currentBook?.copy(year = newValue)
+        validateFields()
     }
 
     fun setPublisher(publisher: Publisher?) {
         currentBook = currentBook?.copy(publisher = publisher)
+        validateFields()
     }
 
     fun setAvailable(available: Boolean) {
         currentBook = currentBook?.copy(available = available)
+        validateFields()
     }
 
     fun setMediaType(mediaType: MediaType) {
         currentBook = currentBook?.copy(mediaType = mediaType)
+        validateFields()
     }
 
     fun setRating(rating: Float) {
         currentBook = currentBook?.copy(rating = rating)
+        validateFields()
     }
 
     fun setCoverImageUri(uri: String) {
         currentBook = currentBook?.copy(coverUrl = uri)
+    }
+
+    private fun validateFields() {
+        val bookDetailsState = uiState.value.bookDetailsState
+        val allFieldsAreValid = if (bookDetailsState is ResultState.Success)
+            bookDetailsState.data?.let {
+                bookUseCase.isBookValid(it)
+            } ?: false
+        else false
+        if (allFieldsAreValid != _uiState.value.areAllFieldsValid) {
+            _uiState.update {
+                it.copy(areAllFieldsValid = allFieldsAreValid)
+            }
+        }
     }
     //endregion
 
@@ -202,7 +234,10 @@ class BookFormViewModel @Inject constructor(
         // Checking if the user has changed the cover image
         val previousCoverUrl = loadedBook?.coverUrl
         val currentCoverUrl = currentBook?.coverUrl
-        if (previousCoverUrl != "" && previousCoverUrl != currentCoverUrl) {
+        if (previousCoverUrl != null &&
+            previousCoverUrl != "" &&
+            previousCoverUrl != currentCoverUrl
+        ) {
             try {
                 val file = Uri.parse(previousCoverUrl).path?.let { File(it) }
                 if (file?.exists() == true) file.delete()
