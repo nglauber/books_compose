@@ -1,11 +1,14 @@
 package com.nglauber.architecture_sample.core_android.ui.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,22 +65,20 @@ fun RatingBar(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
+@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_NO)
 @Composable
 private fun PreviewRatingBar() {
-    BookAppTheme() {
-        Column {
-            RatingBar(rating = 0f, onChange = {})
-            RatingBar(rating = 0.5f, onChange = {})
-            RatingBar(rating = 1f, onChange = {})
-            RatingBar(rating = 1.5f, onChange = {})
-            RatingBar(rating = 2f, onChange = {})
-            RatingBar(rating = 2.5f, onChange = {})
-            RatingBar(rating = 3f, onChange = {})
-            RatingBar(rating = 3.5f, onChange = {})
-            RatingBar(rating = 4f, onChange = {})
-            RatingBar(rating = 4.5f, onChange = {})
-            RatingBar(rating = 5f, onChange = {})
+    BookAppTheme {
+        Surface {
+            Column {
+                RatingBar(rating = 0f, onChange = {})
+                RatingBar(rating = 1f, onChange = {})
+                RatingBar(rating = 2f, onChange = {})
+                RatingBar(rating = 3f, onChange = {})
+                RatingBar(rating = 4f, onChange = {})
+                RatingBar(rating = 5f, onChange = {})
+            }
         }
     }
 }
