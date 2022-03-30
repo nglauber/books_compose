@@ -14,7 +14,7 @@ fun BookFormDestination(
     router: Router<*>,
     backStackEntry: NavBackStackEntry,
 ) {
-    val bookId = backStackEntry.arguments?.getString(BookDetails.paramBookId)
+    val bookId = BookForm.getBookId(backStackEntry)
     val bookFormViewModel: BookFormViewModel = bookFormViewModel(bookId)
     BookFormScreen(
         bookFormViewModel,

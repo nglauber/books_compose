@@ -1,5 +1,6 @@
 package com.nglauber.architecture_sample.books.navigation
 
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.nglauber.architecture_sample.core.navigation.AppRoutes
@@ -11,13 +12,16 @@ object BooksFeature : AppRoutes("BooksFeature")
 object BooksList : AppRoutes("BooksList")
 
 object BookDetails : AppRoutes("BookDetails") {
-    const val paramBookId = "bookId"
+    private const val paramBookId = "bookId"
     override val route: String = "$baseRoute/{$paramBookId}"
     val navArguments = listOf(
         navArgument(paramBookId) {
             type = NavType.StringType
         }
     )
+
+    fun getBookId(backStackEntry: NavBackStackEntry): String? =
+        backStackEntry.arguments?.getString(paramBookId)
 
     fun buildBookDetailsRoute(id: String) = "$baseRoute/$id"
 }
@@ -31,6 +35,9 @@ object BookForm : AppRoutes("BookForm") {
             nullable = true
         }
     )
+
+    fun getBookId(backStackEntry: NavBackStackEntry): String? =
+        backStackEntry.arguments?.getString(paramBookId)
 
     fun buildBookDetailsRoute(id: String?) =
         id?.let { "$baseRoute?$paramBookId=$id" } ?: baseRoute
