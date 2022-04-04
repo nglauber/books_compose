@@ -1,16 +1,14 @@
 package com.nglauber.architecture_sample.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavHostController
 import com.nglauber.architecture_sample.core.auth.Auth
 import com.nglauber.architecture_sample.core.auth.AuthStateListener
 import com.nglauber.architecture_sample.core.theme.ThemeMode
-import com.nglauber.architecture_sample.domain.navigation.Router
 import com.nglauber.architecture_sample.domain.usecases.ThemeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,10 +17,9 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _isLoggedIn = MutableStateFlow<Boolean?>(null)
+    val isLoggedIn: StateFlow<Boolean?> = _isLoggedIn.asStateFlow()
 
     val currentTheme = themeUseCase.themeMode
-
-    var router: Router<NavHostController>? = null
 
     var auth: Auth<*, *>? = null
         set(value) {
@@ -35,16 +32,6 @@ class MainViewModel @Inject constructor(
                 })
             }
         }
-
-    init {
-        viewModelScope.launch {
-            _isLoggedIn.collect { isLoggedInState ->
-                if (isLoggedInState == false) {
-                    router?.showLogin()
-                }
-            }
-        }
-    }
 
     fun isDarkMode(themeMode: ThemeMode): Boolean? {
         return themeUseCase.isDark(themeMode)
