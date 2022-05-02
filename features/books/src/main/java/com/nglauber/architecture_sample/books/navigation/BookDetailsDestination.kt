@@ -12,7 +12,7 @@ fun BookDetailsDestination(
     backStackEntry: NavBackStackEntry
 ) {
     val bookId = BookDetails.getBookId(backStackEntry)
-    val bookDetailsViewModel = bookDetailsViewModel(bookId ?: "")
+    val bookDetailsViewModel = bookDetailsViewModel(backStackEntry, bookId ?: "")
     BookDetailsScreen(
         bookDetailsViewModel,
         onEditClick = {

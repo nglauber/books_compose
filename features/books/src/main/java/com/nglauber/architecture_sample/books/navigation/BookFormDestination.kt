@@ -15,7 +15,7 @@ fun BookFormDestination(
     backStackEntry: NavBackStackEntry,
 ) {
     val bookId = BookForm.getBookId(backStackEntry)
-    val bookFormViewModel: BookFormViewModel = bookFormViewModel(bookId)
+    val bookFormViewModel: BookFormViewModel = bookFormViewModel(backStackEntry, bookId)
     BookFormScreen(
         bookFormViewModel,
         onBookSaved = {
