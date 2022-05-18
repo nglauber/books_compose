@@ -7,7 +7,7 @@ buildscript {
         java_compatibility_version = JavaVersion.VERSION_1_8
         jvm_target_version = '1.8'
 
-        android_plugin_id = '7.3.0-alpha09'
+        android_plugin_id = '7.4.0-alpha01'
 
         accompanist_navigation_animation_version = '0.24.3-alpha'
         accompanist_swiperefresh_version = '0.24.3-alpha'
@@ -22,7 +22,7 @@ buildscript {
         coroutines_version = '1.6.0'
         espresso_core_version = '3.4.0'
         firebase_bom_version = '29.1.0'
-        google_services_version = '4.3.8'
+        google_services_version = '4.3.10'
         hilt_version = '2.41'
         hilt_nav_compose_version = '1.0.0'
         junit_version = '4.13.2'
