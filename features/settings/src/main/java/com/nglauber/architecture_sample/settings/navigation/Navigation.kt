@@ -1,6 +1,8 @@
 package com.nglauber.architecture_sample.settings.navigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navigation
@@ -19,8 +21,10 @@ fun NavGraphBuilder.settingsGraph(
     ) {
         composable(SettingsScreen.route) {
             val settingsViewModel: SettingsViewModel = hiltViewModel()
+            val themeMode by settingsViewModel.currentTheme.collectAsState()
             SettingsScreen(
-                viewModel = settingsViewModel,
+                currentTheme = themeMode,
+                onThemeChange = settingsViewModel::setTheme,
                 onBackPressed = router::back
             )
         }

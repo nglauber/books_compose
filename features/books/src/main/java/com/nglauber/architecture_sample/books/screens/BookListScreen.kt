@@ -30,7 +30,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.nglauber.architecture_sample.books.R
-import com.nglauber.architecture_sample.books.viewmodel.BookListViewModel
 import com.nglauber.architecture_sample.core.ResultState
 import com.nglauber.architecture_sample.core_android.ui.components.AsyncData
 import com.nglauber.architecture_sample.core_android.ui.components.GenericError
@@ -48,29 +47,6 @@ import com.nglauber.architecture_sample.core_android.R as CoreR
 @ExperimentalMaterialApi
 @Composable
 fun BookListScreen(
-    viewModel: BookListViewModel,
-    onNewBookClick: () -> Unit,
-    onSettingsClick: () -> Unit,
-    onBookClick: (Book) -> Unit
-) {
-    val booksListUiState by viewModel.uiState.collectAsState()
-    BooksListContent(
-        booksListState = booksListUiState.bookListState,
-        removeBookState = booksListUiState.removeBookState,
-        onNewBookClick = onNewBookClick,
-        onLogoutClick = viewModel::logout,
-        onSettingsClick = onSettingsClick,
-        onBookClick = onBookClick,
-        onDeleteBook = viewModel::remove,
-        onDeleteBookConfirmed = viewModel::resetRemoveBookState,
-        reloadBooks = viewModel::loadBooks
-    )
-}
-
-@ExperimentalFoundationApi
-@ExperimentalMaterialApi
-@Composable
-private fun BooksListContent(
     booksListState: ResultState<List<Book>>,
     removeBookState: ResultState<Unit>?,
     onNewBookClick: () -> Unit,
@@ -96,66 +72,62 @@ private fun BooksListContent(
             }
         }
     }
-    Scaffold(
-        scaffoldState = scaffoldState,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = stringResource(CoreR.string.app_name))
-                },
-                actions = {
-                    IconButton(onClick = { menuExpanded = !menuExpanded }) {
-                        Icon(Icons.Filled.MoreVert, "More options")
-                        DropdownMenu(expanded = menuExpanded, onDismissRequest = {
-                            menuExpanded = false
-                        }, content = {
-                            DropdownMenuItem(onClick = {
-                                menuExpanded = false
-                                onSettingsClick()
-                            }, content = {
-                                Text(stringResource(CoreR.string.menu_action_settings))
-                            })
-                            DropdownMenuItem(onClick = {
-                                menuExpanded = false
-                                onLogoutClick()
-                            }, content = {
-                                Text(stringResource(CoreR.string.menu_action_logout))
-                            })
-                        })
-                    }
+    Scaffold(scaffoldState = scaffoldState, topBar = {
+        TopAppBar(title = {
+            Text(text = stringResource(CoreR.string.app_name))
+        }, actions = {
+            IconButton(onClick = { menuExpanded = !menuExpanded }) {
+                Icon(Icons.Filled.MoreVert, "More options")
+                DropdownMenu(expanded = menuExpanded, onDismissRequest = {
+                    menuExpanded = false
+                }, content = {
+                    DropdownMenuItem(onClick = {
+                        menuExpanded = false
+                        onSettingsClick()
+                    }, content = {
+                        Text(stringResource(CoreR.string.menu_action_settings))
+                    })
+                    DropdownMenuItem(onClick = {
+                        menuExpanded = false
+                        onLogoutClick()
+                    }, content = {
+                        Text(stringResource(CoreR.string.menu_action_logout))
+                    })
                 })
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onNewBookClick) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = CoreR.drawable.ic_add),
-                    contentDescription = stringResource(
-                        id = R.string.cd_new_book
-                    )
-                )
             }
-        }
-    ) {
-        AsyncData(resultState = booksListState, errorContent = {
-            GenericError(
-                onDismissAction = reloadBooks
+        })
+    }, floatingActionButton = {
+        FloatingActionButton(onClick = onNewBookClick) {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = CoreR.drawable.ic_add),
+                contentDescription = stringResource(
+                    id = R.string.cd_new_book
+                )
             )
-        }) { booksList ->
-            booksList?.let {
-                SwipeRefresh(
-                    state = rememberSwipeRefreshState(booksListState is ResultState.Loading),
-                    onRefresh = reloadBooks,
-                ) {
-                    if (it.isEmpty()) {
-                        EmptyList()
-                    } else {
-                        LazyColumn {
-                            items(booksList, key = { it.id }) { item ->
-                                BookItem(
-                                    book = item,
-                                    onBookClick = onBookClick,
-                                    onDeleteBook = onDeleteBook,
-                                )
+        }
+    }) {
+        Box(Modifier.padding(it)) {
+            AsyncData(resultState = booksListState, errorContent = {
+                GenericError(
+                    onDismissAction = reloadBooks
+                )
+            }) { booksList ->
+                booksList?.let {
+                    SwipeRefresh(
+                        state = rememberSwipeRefreshState(booksListState is ResultState.Loading),
+                        onRefresh = reloadBooks,
+                    ) {
+                        if (it.isEmpty()) {
+                            EmptyList()
+                        } else {
+                            LazyColumn {
+                                items(booksList, key = { book -> book.id }) { item ->
+                                    BookItem(
+                                        book = item,
+                                        onBookClick = onBookClick,
+                                        onDeleteBook = onDeleteBook,
+                                    )
+                                }
                             }
                         }
                     }
@@ -181,37 +153,30 @@ fun BookItem(
     var markedAsDeleted by remember(book.id) {
         mutableStateOf(false)
     }
-    BoxWithConstraints(
-        modifier = Modifier
-            .graphicsLayer {
-                translationX = translateXAnim.value
-            }
-            .animateContentSize(
-                animationSpec = tween(100, easing = LinearEasing),
-                finishedListener = { _, _ ->
-                    if (markedAsDeleted) {
-                        onDeleteBook(book)
-                    }
+    BoxWithConstraints(modifier = Modifier
+        .graphicsLayer {
+            translationX = translateXAnim.value
+        }
+        .animateContentSize(
+            animationSpec = tween(100, easing = LinearEasing),
+            finishedListener = { _, _ ->
+                if (markedAsDeleted) {
+                    onDeleteBook(book)
                 }
-            )
-            .then(
-                if (markedAsDeleted) Modifier.height(height = 0.dp)
-                else Modifier.wrapContentSize()
-            )
-    ) {
-        BookItemContent(
-            book = book,
-            onBookClick = onBookClick,
-            onDeleteBook = {
-                scope.launch {
-                    translateXAnim.animateTo(
-                        targetValue = constraints.maxWidth.toFloat(),
-                        animationSpec = tween(300)
-                    )
-                    markedAsDeleted = true
-                }
-            }
+            })
+        .then(
+            if (markedAsDeleted) Modifier.height(height = 0.dp)
+            else Modifier.wrapContentSize()
         )
+    ) {
+        BookItemContent(book = book, onBookClick = onBookClick, onDeleteBook = {
+            scope.launch {
+                translateXAnim.animateTo(
+                    targetValue = constraints.maxWidth.toFloat(), animationSpec = tween(300)
+                )
+                markedAsDeleted = true
+            }
+        })
     }
 }
 
@@ -225,8 +190,7 @@ fun BookItemContent(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val revealState = rememberRevealState()
-    RevealSwipe(
-        backgroundCardModifier = Modifier.padding(8.dp),
+    RevealSwipe(backgroundCardModifier = Modifier.padding(8.dp),
         state = revealState,
         directions = setOf(RevealDirection.EndToStart),
         hiddenContentEnd = {
@@ -242,8 +206,7 @@ fun BookItemContent(
                     contentDescription = null
                 )
             }
-        }
-    ) {
+        }) {
         Card(
             Modifier
                 .fillMaxWidth()
@@ -311,7 +274,7 @@ fun EmptyList() {
 @Composable
 private fun PreviewBookListContent() {
     BookAppTheme {
-        BooksListContent(
+        BookListScreen(
             booksListState = ResultState.Success(
                 listOf(bookForUiPreview())
             ),

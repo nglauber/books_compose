@@ -8,8 +8,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -18,25 +16,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nglauber.architecture_sample.core.ErrorEntity
+import com.nglauber.architecture_sample.core.ResultState
 import com.nglauber.architecture_sample.core_android.ui.components.AsyncData
 import com.nglauber.architecture_sample.core_android.ui.components.GenericError
 import com.nglauber.architecture_sample.core_android.ui.theme.BookAppTheme
 import com.nglauber.architecture_sample.login.R
-import com.nglauber.architecture_sample.login.viewmodel.LoginViewModel
 import com.nglauber.architecture_sample.core_android.R as CoreR
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel,
+    loginState: ResultState<Unit>?,
+    onLoginClick: () -> Unit,
+    resetLoginState: () -> Unit,
     onLoginSuccess: () -> Unit,
 ) {
-    val loginState by viewModel.loginState.collectAsState()
     AsyncData(
         resultState = loginState,
         errorContent = {
             GenericError(
                 error = ErrorEntity(message = stringResource(id = R.string.msg_login_error)),
-                onDismissAction = viewModel::resetLoginState,
+                onDismissAction = resetLoginState,
             )
         }
     ) { state ->
@@ -46,14 +45,14 @@ fun LoginScreen(
             }
         } else {
             LoginScreenContent(
-                onLoginClick = viewModel::login
+                onLoginClick = onLoginClick
             )
         }
     }
 }
 
 @Composable
-fun LoginScreenContent(
+private fun LoginScreenContent(
     onLoginClick: () -> Unit
 ) {
     Column(

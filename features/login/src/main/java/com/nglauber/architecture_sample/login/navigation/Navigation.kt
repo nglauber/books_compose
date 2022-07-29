@@ -2,6 +2,8 @@ package com.nglauber.architecture_sample.login.navigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navigation
@@ -25,11 +27,12 @@ fun NavGraphBuilder.loginGraph(
             LaunchedEffect(auth) {
                 viewModel.useCase.auth = auth
             }
+            val loginState by viewModel.loginState.collectAsState()
             LoginScreen(
-                viewModel,
-                onLoginSuccess = {
-                    router.showBooksList()
-                }
+                loginState,
+                onLoginClick = viewModel::login,
+                onLoginSuccess = router::showBooksList,
+                resetLoginState = viewModel::resetLoginState,
             )
         }
     }

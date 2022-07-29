@@ -10,8 +10,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -26,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.nglauber.architecture_sample.books.R
-import com.nglauber.architecture_sample.books.viewmodel.BookFormViewModel
+import com.nglauber.architecture_sample.books.viewmodel.BookFormUiState
 import com.nglauber.architecture_sample.core.ResultState
 import com.nglauber.architecture_sample.core_android.ui.components.AsyncData
 import com.nglauber.architecture_sample.core_android.ui.components.ComboBox
@@ -42,11 +40,24 @@ import com.nglauber.architecture_sample.core_android.R as CoreR
 @ExperimentalComposeUiApi
 @Composable
 fun BookFormScreen(
-    viewModel: BookFormViewModel,
+    bookFormUiState: BookFormUiState,
+    currentBook: Book?,
     onBookSaved: () -> Unit,
     onBackPressed: () -> Unit,
+    resetSaveState: () -> Unit,
+    onTitleChanged: (String) -> Unit,
+    onAuthorChanged: (String) -> Unit,
+    onPagesChanged: (String) -> Unit,
+    onYearChanged: (String) -> Unit,
+    onAvailabilityChange: (Boolean) -> Unit,
+    onRatingChanged: (Float) -> Unit,
+    onMediaTypeChanged: (MediaType) -> Unit,
+    onPublisherChanged: (Publisher) -> Unit,
+    onCreateCoverImageUri: () -> Uri,
+    onConfirmCoverImage: () -> Unit,
+    onDeleteCoverImage: () -> Unit,
+    onSaveClick: () -> Unit,
 ) {
-    val bookFormUiState by viewModel.uiState.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -66,40 +77,42 @@ fun BookFormScreen(
             )
         }
     ) {
-        AsyncData(
-            resultState = bookFormUiState.bookDetailsState,
-        ) {
-            viewModel.currentBook?.let { book ->
-                AsyncData(
-                    resultState = bookFormUiState.saveBookState,
-                    errorContent = {
-                        GenericError(
-                            onDismissAction = viewModel::resetSaveState
-                        )
-                    }
-                ) {
-                    if (bookFormUiState.saveBookState is ResultState.Success) {
-                        LaunchedEffect(bookFormUiState.saveBookState) {
-                            onBookSaved()
+        Box(Modifier.padding(it)) {
+            AsyncData(
+                resultState = bookFormUiState.bookDetailsState,
+            ) {
+                currentBook?.let { book ->
+                    AsyncData(
+                        resultState = bookFormUiState.saveBookState,
+                        errorContent = {
+                            GenericError(
+                                onDismissAction = resetSaveState
+                            )
                         }
-                    } else {
-                        BookFormScreenContent(
-                            book = book,
-                            onTitleChanged = viewModel::setTitle,
-                            onAuthorChanged = viewModel::setAuthor,
-                            onPagesChanged = viewModel::setPages,
-                            onYearChanged = viewModel::setYear,
-                            onAvailabilityChange = viewModel::setAvailable,
-                            onRatingChanged = viewModel::setRating,
-                            onMediaTypeChanged = viewModel::setMediaType,
-                            publishers = bookFormUiState.publishers,
-                            onPublisherChanged = viewModel::setPublisher,
-                            onCreateCoverImageUri = viewModel::createTempImageFile,
-                            onConfirmCoverImage = viewModel::assignCoverImage,
-                            onDeleteCoverImage = { viewModel.setCoverImageUri("") },
-                            isFormValid = bookFormUiState.areAllFieldsValid,
-                            onSaveClick = viewModel::saveBook
-                        )
+                    ) {
+                        if (bookFormUiState.saveBookState is ResultState.Success) {
+                            LaunchedEffect(bookFormUiState.saveBookState) {
+                                onBookSaved()
+                            }
+                        } else {
+                            BookFormScreenContent(
+                                book = book,
+                                onTitleChanged = onTitleChanged,
+                                onAuthorChanged = onAuthorChanged,
+                                onPagesChanged = onPagesChanged,
+                                onYearChanged = onYearChanged,
+                                onAvailabilityChange = onAvailabilityChange,
+                                onRatingChanged = onRatingChanged,
+                                onMediaTypeChanged = onMediaTypeChanged,
+                                publishers = bookFormUiState.publishers,
+                                onPublisherChanged = onPublisherChanged,
+                                onCreateCoverImageUri = onCreateCoverImageUri,
+                                onConfirmCoverImage = onConfirmCoverImage,
+                                onDeleteCoverImage = onDeleteCoverImage,
+                                isFormValid = bookFormUiState.areAllFieldsValid,
+                                onSaveClick = onSaveClick
+                            )
+                        }
                     }
                 }
             }

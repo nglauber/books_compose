@@ -4,6 +4,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nglauber.architecture_sample.books.screens.BookListScreen
 import com.nglauber.architecture_sample.books.viewmodel.BookListViewModel
@@ -21,16 +23,22 @@ fun BookListDestination(
     LaunchedEffect(auth) {
         booksListViewModel.authUseCase.auth = auth
     }
+    val booksListUiState by booksListViewModel.uiState.collectAsState()
     BookListScreen(
-        booksListViewModel,
+        booksListState = booksListUiState.bookListState,
+        removeBookState = booksListUiState.removeBookState,
         onNewBookClick = {
             router.showBookForm()
+        },
+        onLogoutClick = booksListViewModel::logout,
+        onSettingsClick = {
+            router.showSettings()
         },
         onBookClick = {
             router.showBookDetails(it)
         },
-        onSettingsClick = {
-            router.showSettings()
-        }
+        onDeleteBook = booksListViewModel::remove,
+        onDeleteBookConfirmed = booksListViewModel::resetRemoveBookState,
+        reloadBooks = booksListViewModel::loadBooks
     )
 }

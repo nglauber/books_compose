@@ -7,8 +7,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -20,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.nglauber.architecture_sample.books.R
-import com.nglauber.architecture_sample.books.viewmodel.BookDetailsViewModel
 import com.nglauber.architecture_sample.core.ResultState
 import com.nglauber.architecture_sample.core_android.ui.components.AsyncData
 import com.nglauber.architecture_sample.core_android.ui.components.GenericError
@@ -32,20 +29,6 @@ import com.nglauber.architecture_sample.core_android.R as CoreR
 
 @Composable
 fun BookDetailsScreen(
-    viewModel: BookDetailsViewModel,
-    onEditClick: (Book) -> Unit,
-    onBackPressed: () -> Unit,
-) {
-    val bookDetailsState by viewModel.booksDetailsState.collectAsState()
-    BookDetailsContent(
-        bookDetailsState = bookDetailsState,
-        onEditClick = onEditClick,
-        onBackPressed = onBackPressed,
-    )
-}
-
-@Composable
-private fun BookDetailsContent(
     bookDetailsState: ResultState<Book?>,
     onEditClick: (Book) -> Unit,
     onBackPressed: () -> Unit,
@@ -91,7 +74,7 @@ private fun BookDetailsContent(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
-                        .padding(24.dp)
+                        .padding(it)
                 ) {
                     Image(
                         painter = rememberAsyncImagePainter(book.coverUrl),
@@ -143,7 +126,7 @@ private fun BookDetailsContent(
 @Composable
 private fun PreviewBookDetailsContent() {
     BookAppTheme {
-        BookDetailsContent(
+        BookDetailsScreen(
             bookDetailsState = ResultState.Success(bookForUiPreview()),
             onEditClick = {},
             onBackPressed = {},
