@@ -10,7 +10,8 @@ import com.nglauber.architecture_sample.domain.navigation.Router
 
 @Composable
 fun BookDetailsDestination(
-    router: Router<*>, backStackEntry: NavBackStackEntry
+    router: Router,
+    backStackEntry: NavBackStackEntry
 ) {
     val bookId = BookDetails.getBookId(backStackEntry)
     val bookDetailsViewModel = bookDetailsViewModel(backStackEntry, bookId ?: "")

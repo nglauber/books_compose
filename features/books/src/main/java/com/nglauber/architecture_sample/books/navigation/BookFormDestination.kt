@@ -13,7 +13,7 @@ import com.nglauber.architecture_sample.domain.navigation.Router
 @ExperimentalComposeUiApi
 @Composable
 fun BookFormDestination(
-    router: Router<*>,
+    router: Router,
     backStackEntry: NavBackStackEntry,
 ) {
     val bookId = BookForm.getBookId(backStackEntry)

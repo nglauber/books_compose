@@ -17,7 +17,7 @@ import com.nglauber.architecture_sample.domain.navigation.Router
 @ExperimentalAnimationApi
 fun NavGraphBuilder.booksGraph(
     auth: Auth<*, *>,
-    router: Router<*>
+    router: Router
 ) {
     val popupScreens = { route: String? ->
         route == BookForm.route

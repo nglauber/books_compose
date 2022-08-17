@@ -2,8 +2,7 @@ package com.nglauber.architecture_sample.domain.navigation
 
 import com.nglauber.architecture_sample.domain.entities.Book
 
-interface Router<T> {
-    val navigationController: T
+interface Router {
     fun showLogin()
     fun showBooksList()
     fun showBookForm(book: Book? = null)

@@ -81,16 +81,14 @@ class BookFormViewModel @AssistedInject constructor(
         loadBookJob = viewModelScope.launch {
             bookUseCase.loadBookDetails(bookId).collect { bookState ->
                 _uiState.update {
-                    val newState = it.copy(
-                        bookDetailsState = bookState
-                    )
                     if (bookState is ResultState.Success) {
                         loadedBook = bookState.data
                         currentBook = bookState.data
                     }
-                    newState
+                    it.copy(
+                        bookDetailsState = bookState
+                    )
                 }
-
             }
         }
     }

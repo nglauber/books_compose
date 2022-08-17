@@ -11,10 +11,8 @@ import com.nglauber.architecture_sample.login.navigation.LoginScreen
 import com.nglauber.architecture_sample.settings.navigation.SettingsFeature
 
 class RouterImpl(
-    navController: NavHostController
-) : Router<NavHostController> {
-
-    override val navigationController = navController
+    private val navigationController: NavHostController
+) : Router {
 
     override fun showLogin() {
         navigationController.navigate(LoginScreen.route) {

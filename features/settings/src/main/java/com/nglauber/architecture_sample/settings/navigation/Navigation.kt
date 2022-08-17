@@ -13,7 +13,7 @@ import com.nglauber.architecture_sample.settings.viewmodel.SettingsViewModel
 
 @ExperimentalAnimationApi
 fun NavGraphBuilder.settingsGraph(
-    router: Router<*>
+    router: Router
 ) {
     navigation(
         route = SettingsFeature.route,

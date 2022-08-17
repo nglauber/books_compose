@@ -16,7 +16,7 @@ import com.nglauber.architecture_sample.domain.navigation.Router
 @ExperimentalFoundationApi
 @Composable
 fun BookListDestination(
-    router: Router<*>,
+    router: Router,
     auth: Auth<*, *>,
 ) {
     val booksListViewModel = hiltViewModel<BookListViewModel>()

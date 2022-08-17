@@ -16,7 +16,7 @@ import com.nglauber.architecture_sample.login.viewmodel.LoginViewModel
 @ExperimentalAnimationApi
 fun NavGraphBuilder.loginGraph(
     auth: Auth<*, *>,
-    router: Router<*>
+    router: Router
 ) {
     navigation(
         route = LoginFeature.route,
