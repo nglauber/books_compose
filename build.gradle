@@ -22,7 +22,7 @@ buildscript {
         coroutines_version = '1.6.0'
         espresso_core_version = '3.4.0'
         firebase_bom_version = '29.1.0'
-        google_services_version = '4.3.10'
+        google_services_version = '4.3.13'
         hilt_version = '2.42'
         hilt_nav_compose_version = '1.0.0'
         junit_version = '4.13.2'

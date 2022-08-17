@@ -3,6 +3,7 @@ package com.nglauber.architecture_sample.di
 import android.content.Context
 import androidx.activity.ComponentActivity
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.nglauber.architecture_sample.BookApp
 import com.nglauber.architecture_sample.R
 import com.nglauber.architecture_sample.core.auth.Auth
 import com.nglauber.architecture_sample.login.auth.FirebaseSignIn
@@ -10,6 +11,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.hilt.android.qualifiers.ActivityContext
 
 @Module
@@ -23,5 +25,15 @@ class AuthModule {
             context as ComponentActivity,
             context.getString(R.string.default_web_client_id)
         )
+    }
+}
+
+@Module
+@InstallIn(ActivityRetainedComponent::class)
+class AuthActivityRetainedModule {
+    @Provides
+    fun providesAuth(): Auth<*, *> {
+        // FIXME this is a workaround because the FirebaseAuth is activity scoped
+        return BookApp.instance?.auth!!
     }
 }

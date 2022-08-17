@@ -1,6 +1,9 @@
 package com.nglauber.architecture_sample.viewmodel
 
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import com.nglauber.architecture_sample.BookApp
 import com.nglauber.architecture_sample.core.auth.Auth
 import com.nglauber.architecture_sample.core.auth.AuthStateListener
 import com.nglauber.architecture_sample.core.theme.ThemeMode
@@ -14,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val themeUseCase: ThemeUseCase
-) : ViewModel() {
+) : ViewModel(), DefaultLifecycleObserver {
 
     private val _isLoggedIn = MutableStateFlow<Boolean?>(null)
     val isLoggedIn: StateFlow<Boolean?> = _isLoggedIn.asStateFlow()
@@ -23,8 +26,8 @@ class MainViewModel @Inject constructor(
 
     var auth: Auth<*, *>? = null
         set(value) {
+            field?.removeAllListeners()
             field = value?.apply {
-                removeAllListeners()
                 addAuthChangeListener(object : AuthStateListener {
                     override fun onAuthChanged(isLoggedIn: Boolean) {
                         _isLoggedIn.value = isLoggedIn
@@ -35,5 +38,10 @@ class MainViewModel @Inject constructor(
 
     fun isDarkMode(themeMode: ThemeMode): Boolean? {
         return themeUseCase.isDark(themeMode)
+    }
+
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
+        auth = BookApp.instance?.auth
     }
 }

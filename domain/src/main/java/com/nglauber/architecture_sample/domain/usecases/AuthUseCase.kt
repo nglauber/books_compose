@@ -8,11 +8,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 
-class AuthUseCase @Inject constructor() {
-
-    // FIXME this is a workaround because the FirebaseAuth is activity scoped
-    lateinit var auth: Auth<*, *>
-
+class AuthUseCase @Inject constructor(
+    private val auth: Auth<*, *>
+) {
     fun login(): Flow<ResultState<Unit>> {
         return callbackFlow {
             trySend(ResultState.Loading)

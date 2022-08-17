@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BookListViewModel @Inject constructor(
     private val bookUseCase: BookUseCase,
-    val authUseCase: AuthUseCase,
+    private val authUseCase: AuthUseCase,
 ) : ViewModel(), LifecycleObserver {
 
     private var loadBooksJob: Job? = null

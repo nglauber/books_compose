@@ -8,7 +8,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.nglauber.architecture_sample.books.navigation.BooksFeature
 import com.nglauber.architecture_sample.books.navigation.booksGraph
-import com.nglauber.architecture_sample.core.auth.Auth
 import com.nglauber.architecture_sample.login.navigation.LoginFeature
 import com.nglauber.architecture_sample.login.navigation.loginGraph
 import com.nglauber.architecture_sample.settings.navigation.settingsGraph
@@ -21,17 +20,17 @@ import com.nglauber.architecture_sample.ui.BooksAppState
 @Composable
 fun MainNavigation(
     appState: BooksAppState,
-    auth: Auth<*, *>,
+    isLoggedIn: Boolean,
 ) {
     val initialRoute =
-        if (auth.isLoggedIn()) BooksFeature.route else LoginFeature.route
+        if (isLoggedIn) BooksFeature.route else LoginFeature.route
 
     AnimatedNavHost(
         appState.navHostController,
         startDestination = initialRoute
     ) {
-        loginGraph(auth, appState.router)
-        booksGraph(auth, appState.router)
+        loginGraph(appState.router)
+        booksGraph(appState.router)
         settingsGraph(appState.router)
     }
 }

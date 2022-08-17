@@ -17,6 +17,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.nglauber.architecture_sample.core.auth.Auth
 import com.nglauber.architecture_sample.domain.navigation.Router
 import com.nglauber.architecture_sample.ui.BooksApp
+import com.nglauber.architecture_sample.ui.rememberBooksAppState
 import com.nglauber.architecture_sample.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -37,16 +38,27 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainViewModel.auth = auth
+        BookApp.instance?.auth = auth
+        lifecycle.addObserver(mainViewModel)
         setContent {
+            val appState = rememberBooksAppState()
             val themeMode by mainViewModel.currentTheme.collectAsState()
             val isDark = mainViewModel.isDarkMode(themeMode) ?: isSystemInDarkTheme()
-            BooksApp(auth = auth, isDark = isDark) { appState ->
-                LaunchedEffect(this@MainActivity) {
-                    launchLoginObserver(appState.router)
-                }
+            BooksApp(
+                appState = appState,
+                isLoggedIn = auth.isLoggedIn(),
+                isDark = isDark
+            )
+            LaunchedEffect(this@MainActivity) {
+                launchLoginObserver(appState.router)
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycle.removeObserver(mainViewModel)
+        BookApp.instance?.auth = null
     }
 
     private fun launchLoginObserver(router: Router) {

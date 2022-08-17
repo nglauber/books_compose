@@ -6,7 +6,6 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.navigation
-import com.nglauber.architecture_sample.core.auth.Auth
 import com.nglauber.architecture_sample.core_android.ui.navigation.composablePopup
 import com.nglauber.architecture_sample.core_android.ui.navigation.composableScreen
 import com.nglauber.architecture_sample.domain.navigation.Router
@@ -16,7 +15,6 @@ import com.nglauber.architecture_sample.domain.navigation.Router
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 fun NavGraphBuilder.booksGraph(
-    auth: Auth<*, *>,
     router: Router
 ) {
     val popupScreens = { route: String? ->
@@ -30,7 +28,7 @@ fun NavGraphBuilder.booksGraph(
             BooksList.route,
             targetIsPopup = popupScreens
         ) {
-            BookListDestination(router = router, auth = auth)
+            BookListDestination(router = router)
         }
         composableScreen(
             BookDetails.route,
