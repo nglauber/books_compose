@@ -17,9 +17,9 @@ fun NavGraphBuilder.settingsGraph(
 ) {
     navigation(
         route = SettingsFeature.route,
-        startDestination = SettingsScreen.route,
+        startDestination = SettingsScreenRoute.route,
     ) {
-        composable(SettingsScreen.route) {
+        composable(SettingsScreenRoute.route) {
             val settingsViewModel: SettingsViewModel = hiltViewModel()
             val themeMode by settingsViewModel.currentTheme.collectAsState()
             SettingsScreen(

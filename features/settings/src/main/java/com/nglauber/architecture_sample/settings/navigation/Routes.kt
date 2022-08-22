@@ -6,4 +6,4 @@ import com.nglauber.architecture_sample.core.navigation.AppRoutes
 object SettingsFeature : AppRoutes("SettingsFeature")
 
 // Settings Screen
-object SettingsScreen : AppRoutes("SettingsScreen")
+object SettingsScreenRoute : AppRoutes("SettingsScreen")

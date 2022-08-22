@@ -6,4 +6,4 @@ import com.nglauber.architecture_sample.core.navigation.AppRoutes
 object LoginFeature : AppRoutes("LoginFeature")
 
 // Login Screen
-object LoginScreen : AppRoutes("LoginScreen")
+object LoginScreenRoute : AppRoutes("LoginScreen")

@@ -13,7 +13,7 @@ fun BookDetailsDestination(
     router: Router,
     backStackEntry: NavBackStackEntry
 ) {
-    val bookId = BookDetails.getBookId(backStackEntry)
+    val bookId = BookDetailsRoute.getBookId(backStackEntry)
     val bookDetailsViewModel = bookDetailsViewModel(backStackEntry, bookId ?: "")
     val bookDetailsState by bookDetailsViewModel.booksDetailsState.collectAsState()
     BookDetailsScreen(

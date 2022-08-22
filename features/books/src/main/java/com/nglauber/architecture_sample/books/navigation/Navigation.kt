@@ -18,28 +18,28 @@ fun NavGraphBuilder.booksGraph(
     router: Router
 ) {
     val popupScreens = { route: String? ->
-        route == BookForm.route
+        route == BookFormRoute.route
     }
     navigation(
         route = BooksFeature.route,
-        startDestination = BooksList.route,
+        startDestination = BooksListRoute.route,
     ) {
         composableScreen(
-            BooksList.route,
+            BooksListRoute.route,
             targetIsPopup = popupScreens
         ) {
             BookListDestination(router = router)
         }
         composableScreen(
-            BookDetails.route,
-            arguments = BookDetails.navArguments,
+            BookDetailsRoute.route,
+            arguments = BookDetailsRoute.navArguments,
             targetIsPopup = popupScreens
         ) { backStackEntry ->
             BookDetailsDestination(router = router, backStackEntry = backStackEntry)
         }
         composablePopup(
-            BookForm.route,
-            arguments = BookForm.navArguments
+            BookFormRoute.route,
+            arguments = BookFormRoute.navArguments
         ) { backStackEntry ->
             BookFormDestination(router = router, backStackEntry = backStackEntry)
         }

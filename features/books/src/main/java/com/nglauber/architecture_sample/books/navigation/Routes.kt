@@ -9,9 +9,9 @@ import com.nglauber.architecture_sample.core.navigation.AppRoutes
 object BooksFeature : AppRoutes("BooksFeature")
 
 // Screens
-object BooksList : AppRoutes("BooksList")
+object BooksListRoute : AppRoutes("BooksList")
 
-object BookDetails : AppRoutes("BookDetails") {
+object BookDetailsRoute : AppRoutes("BookDetails") {
     private const val paramBookId = "bookId"
     override val route: String = "$baseRoute/{$paramBookId}"
     val navArguments = listOf(
@@ -26,7 +26,7 @@ object BookDetails : AppRoutes("BookDetails") {
     fun buildBookDetailsRoute(id: String) = "$baseRoute/$id"
 }
 
-object BookForm : AppRoutes("BookForm") {
+object BookFormRoute : AppRoutes("BookForm") {
     private const val paramBookId = "bookId"
     override val route: String = "$baseRoute?$paramBookId={$paramBookId}"
     val navArguments = listOf(

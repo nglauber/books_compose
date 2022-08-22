@@ -17,9 +17,9 @@ fun NavGraphBuilder.loginGraph(
 ) {
     navigation(
         route = LoginFeature.route,
-        startDestination = LoginScreen.route,
+        startDestination = LoginScreenRoute.route,
     ) {
-        composable(LoginScreen.route) {
+        composable(LoginScreenRoute.route) {
             val viewModel = hiltViewModel<LoginViewModel>()
             val loginState by viewModel.loginState.collectAsState()
             LoginScreen(
