@@ -15,10 +15,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.*
 import java.io.File
 
 class BookFormViewModel @AssistedInject constructor(
@@ -59,15 +56,13 @@ class BookFormViewModel @AssistedInject constructor(
         }
 
     init {
-        viewModelScope.launch {
-            bookUseCase.listPublishers().collect { publishersState ->
-                if (publishersState is ResultState.Success) {
-                    _uiState.update {
-                        it.copy(publishers = publishersState.data)
-                    }
+        bookUseCase.listPublishers().onEach { publishersState ->
+            if (publishersState is ResultState.Success) {
+                _uiState.update {
+                    it.copy(publishers = publishersState.data)
                 }
             }
-        }
+        }.launchIn(viewModelScope)
         if (bookId == null) {
             currentBook = Book()
         } else {
@@ -78,19 +73,18 @@ class BookFormViewModel @AssistedInject constructor(
     fun loadBook(bookId: String) {
         if (bookId == currentBook?.id) return
         loadBookJob?.cancel()
-        loadBookJob = viewModelScope.launch {
-            bookUseCase.loadBookDetails(bookId).collect { bookState ->
-                _uiState.update {
-                    if (bookState is ResultState.Success) {
-                        loadedBook = bookState.data
-                        currentBook = bookState.data
-                    }
-                    it.copy(
-                        bookDetailsState = bookState
-                    )
+        loadBookJob = bookUseCase.loadBookDetails(bookId).onEach { bookState ->
+            _uiState.update {
+                if (bookState is ResultState.Success) {
+                    loadedBook = bookState.data
+                    currentBook = bookState.data
                 }
+                it.copy(
+                    bookDetailsState = bookState
+                )
             }
-        }
+        }.launchIn(viewModelScope)
+
     }
 
     // This function is used to dismiss the error message during the saving process.
@@ -105,17 +99,15 @@ class BookFormViewModel @AssistedInject constructor(
         if (state is ResultState.Success) {
             state.data?.let { book ->
                 saveBookJob?.cancel()
-                saveBookJob = viewModelScope.launch {
-                    bookUseCase.saveBook(book).collect { saveBookState ->
-                        _uiState.update {
-                            it.copy(saveBookState = saveBookState)
-                        }
-                        if (saveBookState is ResultState.Success) {
-                            mustDeleteCoverImage = false
-                            deletePreviousCoverImage()
-                        }
+                saveBookJob = bookUseCase.saveBook(book).onEach { saveBookState ->
+                    _uiState.update {
+                        it.copy(saveBookState = saveBookState)
                     }
-                }
+                    if (saveBookState is ResultState.Success) {
+                        mustDeleteCoverImage = false
+                        deletePreviousCoverImage()
+                    }
+                }.launchIn(viewModelScope)
             }
         }
     }
@@ -193,11 +185,11 @@ class BookFormViewModel @AssistedInject constructor(
 
     private fun validateFields() {
         val bookDetailsState = uiState.value.bookDetailsState
-        val allFieldsAreValid = if (bookDetailsState is ResultState.Success)
-            bookDetailsState.data?.let {
+        val allFieldsAreValid =
+            if (bookDetailsState is ResultState.Success) bookDetailsState.data?.let {
                 bookUseCase.isBookValid(it)
             } ?: false
-        else false
+            else false
         if (allFieldsAreValid != _uiState.value.areAllFieldsValid) {
             _uiState.update {
                 it.copy(areAllFieldsValid = allFieldsAreValid)
@@ -234,10 +226,7 @@ class BookFormViewModel @AssistedInject constructor(
         // Checking if the user has changed the cover image
         val previousCoverUrl = loadedBook?.coverUrl
         val currentCoverUrl = currentBook?.coverUrl
-        if (previousCoverUrl != null &&
-            previousCoverUrl != "" &&
-            previousCoverUrl != currentCoverUrl
-        ) {
+        if (previousCoverUrl != null && previousCoverUrl != "" && previousCoverUrl != currentCoverUrl) {
             try {
                 val file = Uri.parse(previousCoverUrl).path?.let { File(it) }
                 if (file?.exists() == true) file.delete()
@@ -261,8 +250,7 @@ class BookFormViewModel @AssistedInject constructor(
     companion object {
         @Suppress("UNCHECKED_CAST")
         fun provideFactory(
-            assistedFactory: Factory,
-            bookId: String?
+            assistedFactory: Factory, bookId: String?
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return assistedFactory.create(bookId) as T

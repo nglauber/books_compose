@@ -12,7 +12,8 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class BookDetailsViewModel @AssistedInject constructor(
     private val bookUseCase: BookUseCase,
@@ -30,15 +31,13 @@ class BookDetailsViewModel @AssistedInject constructor(
 
     fun loadBook(bookId: String) {
         val currentState = _booksDetailsState.value
-        if (currentState is ResultState.Success && bookId == currentState.data?.id)
-            return // avoid to reload the same book again
+        if (currentState is ResultState.Success && bookId == currentState.data?.id) return // avoid to reload the same book again
 
         loadBookJob?.cancel()
-        loadBookJob = viewModelScope.launch {
-            bookUseCase.loadBookDetails(bookId).collect {
-                _booksDetailsState.value = it
-            }
-        }
+        loadBookJob = bookUseCase.loadBookDetails(bookId).onEach {
+            _booksDetailsState.value = it
+        }.launchIn(viewModelScope)
+
     }
 
     @AssistedFactory
@@ -49,8 +48,7 @@ class BookDetailsViewModel @AssistedInject constructor(
     companion object {
         @Suppress("UNCHECKED_CAST")
         fun provideFactory(
-            assistedFactory: Factory,
-            bookId: String
+            assistedFactory: Factory, bookId: String
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return assistedFactory.create(bookId) as T

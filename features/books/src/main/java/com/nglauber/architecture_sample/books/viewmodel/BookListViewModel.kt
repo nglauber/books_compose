@@ -8,10 +8,7 @@ import com.nglauber.architecture_sample.domain.usecases.AuthUseCase
 import com.nglauber.architecture_sample.domain.usecases.BookUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,24 +29,20 @@ class BookListViewModel @Inject constructor(
 
     fun loadBooks() {
         loadBooksJob?.cancel()
-        loadBooksJob = viewModelScope.launch {
-            bookUseCase.listBooks().collect { resultState ->
-                _uiState.update {
-                    it.copy(bookListState = resultState)
-                }
+        loadBooksJob = bookUseCase.listBooks().onEach { resultState ->
+            _uiState.update {
+                it.copy(bookListState = resultState)
             }
-        }
+        }.launchIn(viewModelScope)
     }
 
     fun remove(book: Book) {
         removeBookJob?.cancel()
-        removeBookJob = viewModelScope.launch {
-            bookUseCase.removeBook(book).collect { resultState ->
-                _uiState.update {
-                    it.copy(removeBookState = resultState)
-                }
+        removeBookJob = bookUseCase.removeBook(book).onEach { resultState ->
+            _uiState.update {
+                it.copy(removeBookState = resultState)
             }
-        }
+        }.launchIn(viewModelScope)
     }
 
     fun resetRemoveBookState() {

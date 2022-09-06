@@ -8,7 +8,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,11 +24,9 @@ class LoginViewModel @Inject constructor(
 
     fun login() {
         loginJob?.cancel()
-        loginJob = viewModelScope.launch {
-            useCase.login().collect {
-                _loginState.value = it
-            }
-        }
+        loginJob = useCase.login().onEach {
+            _loginState.value = it
+        }.launchIn(viewModelScope)
     }
 
     fun resetLoginState() {
