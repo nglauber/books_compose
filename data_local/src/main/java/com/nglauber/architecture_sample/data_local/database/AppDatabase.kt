@@ -22,14 +22,21 @@ internal abstract class AppDatabase : RoomDatabase() {
 
         private var instance: AppDatabase? = null
 
-        fun getDatabase(context: Context): AppDatabase {
+        fun getDatabase(context: Context, inMemory: Boolean = false): AppDatabase {
             if (instance == null) {
-                instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
-                    DB_NAME
-                )
-                    .build()
+                instance = if (inMemory) {
+                    Room.inMemoryDatabaseBuilder(
+                        context.applicationContext,
+                        AppDatabase::class.java,
+                    ).allowMainThreadQueries().build()
+                } else {
+                    Room.databaseBuilder(
+                        context.applicationContext,
+                        AppDatabase::class.java,
+                        DB_NAME
+                    ).build()
+                }
+
             }
             return instance as AppDatabase
         }

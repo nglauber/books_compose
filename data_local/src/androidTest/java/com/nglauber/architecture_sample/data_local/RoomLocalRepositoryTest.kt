@@ -31,7 +31,7 @@ class RoomLocalRepositoryTest {
 
     @Before
     fun initDb() {
-        repo = RoomLocalRepository(context, LocalFileHelper())
+        repo = RoomLocalRepository(context, LocalFileHelper(), inMemory = true)
         dummyBook = Book(
             id = UUID.randomUUID().toString(),
             title = "Dominando o Android",

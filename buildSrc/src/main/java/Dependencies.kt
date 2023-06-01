@@ -2,8 +2,8 @@ import Versions.accompanist_navigation_animation_version
 import Versions.accompanist_swiperefresh_version
 import Versions.activity_compose_version
 import Versions.androidx_exif_version
+import Versions.androidx_test_core_version
 import Versions.androidx_test_ext_kotlin_runner_version
-import Versions.androidx_text_core_version
 import Versions.app_compat_version
 import Versions.coil_version
 import Versions.compose_ui_version
@@ -26,6 +26,7 @@ import Versions.reveal_swipe_version
 import Versions.room_version
 import Versions.test_ext_version
 import Versions.test_runner_version
+import Versions.tracing_version
 import org.gradle.api.JavaVersion
 
 object Plugins {
@@ -37,55 +38,57 @@ object Plugins {
     const val kotlin_android = "org.jetbrains.kotlin.android"
     const val kotlin_jvm = "org.jetbrains.kotlin.jvm"
     const val kotlin_kapt = "kapt"
+    const val dependencies_check = "com.github.ben-manes.versions"
 }
 
 object Apps {
     const val application_id = "com.nglauber.architecture_sample"
-    const val compile_sdk_version = 32
+    const val compile_sdk_version = 33
     const val min_sdk_version = 24
-    const val target_sdk_version = 32
+    const val target_sdk_version = 33
 
     const val version_code = 1
     const val version_name = "1.0.0"
 
-    const val jvm_target_version = "1.8"
-    val java_compatibility_version = JavaVersion.VERSION_1_8
+    const val jvm_target_version = "17"
+    val java_compatibility_version = JavaVersion.VERSION_17
 
     const val test_instrumentation_runner = "androidx.test.runner.AndroidJUnitRunner"
 }
 
 object Versions {
-    const val android_plugin_id = "7.2.2"
-    const val accompanist_navigation_animation_version = "0.24.12-rc"
-    const val accompanist_swiperefresh_version = "0.24.12-rc"
-    const val activity_compose_version = "1.6.0-alpha05"
-    const val androidx_exif_version = "1.3.3"
-    const val androidx_text_core_version = "1.4.0"
-    const val androidx_test_ext_kotlin_runner_version = "1.1.3"
-    const val app_compat_version = "1.5.0"
-    const val coil_version = "2.0.0-rc01"
-    const val compose_ui_version = "1.2.0"
-    const val core_ktx_version = "1.7.0"
-    const val core_testing_version = "2.1.0"
-    const val coroutines_version = "1.6.0"
-    const val espresso_core_version = "3.4.0"
-    const val firebase_bom_version = "29.1.0"
-    const val google_services_version = "4.3.13"
-    const val hilt_version = "2.42"
-    const val hilt_nav_compose_version = "1.0.0"
+    const val android_plugin_id = "8.0.2"
+    const val accompanist_navigation_animation_version = "0.31.3-beta"
+    const val accompanist_swiperefresh_version = "0.31.3-beta"
+    const val activity_compose_version = "1.7.2"
+    const val androidx_exif_version = "1.3.6"
+    const val androidx_test_core_version = "1.6.0-alpha01"
+    const val androidx_test_ext_kotlin_runner_version = "1.1.5"
+    const val app_compat_version = "1.7.0-alpha02"
+    const val coil_version = "2.4.0"
+    const val compose_ui_version = "1.5.0-beta01"
+    const val core_ktx_version = "1.9.0-alpha05"
+    const val core_testing_version = "2.2.0"
+    const val coroutines_version = "1.7.1"
+    const val dependencies_check_version = "0.46.0"
+    const val espresso_core_version = "3.6.0-alpha01"
+    const val firebase_bom_version = "32.1.0"
+    const val google_services_version = "4.3.15"
+    const val hilt_version = "2.46.1"
+    const val hilt_nav_compose_version = "1.1.0-alpha01"
     const val junit_version = "4.13.2"
-    const val kotlin_version = "1.7.0"
-    const val kotlin_compiler_ext_version = "1.2.0"
-    const val lifecycle_runtime_version = "2.4.1"
-    const val lifecycle_viewmodel_version = "2.4.1"
-    const val material_compose = "1.2.0-alpha05"
-    const val material_android_version = "1.5.0"
-    const val mockk_version = "1.12.2"
-    const val playservices_version = "20.1.0"
-    const val reveal_swipe_version = "1.0.0"
-    const val room_version = "2.4.3"
-    const val test_ext_version = "1.1.3"
-    const val test_runner_version = "1.4.0"
+    const val kotlin_version = "1.8.21"
+    const val kotlin_compiler_ext_version = "1.4.7"
+    const val lifecycle_runtime_version = "2.6.1"
+    const val lifecycle_viewmodel_version = "2.6.1"
+    const val material_compose = "1.5.0-beta01"
+    const val mockk_version = "1.13.2"
+    const val playservices_version = "20.5.0"
+    const val reveal_swipe_version = "1.1.0"
+    const val room_version = "2.6.0-alpha01"
+    const val test_ext_version = "1.1.5"
+    const val test_runner_version = "1.6.0-alpha01"
+    const val tracing_version = "1.1.0"
 }
 
 object BuildDependencies {
@@ -125,14 +128,13 @@ object Libs {
         "androidx.exifinterface:exifinterface:$androidx_exif_version"
     const val firebase_bom =
         "com.google.firebase:firebase-bom:$firebase_bom_version"
-    const val firebase_core =
-        "com.google.firebase:firebase-core"
+
+    //    const val firebase_core =
+//        "com.google.firebase:firebase-core-ktx"
     const val firebase_firestore =
-        "com.google.firebase:firebase-firestore"
+        "com.google.firebase:firebase-firestore-ktx"
     const val firebase_storage =
-        "com.google.firebase:firebase-storage"
-    const val firebase_auth =
-        "com.google.firebase:firebase-auth"
+        "com.google.firebase:firebase-storage-ktx"
     const val firebase_auth_ktx =
         "com.google.firebase:firebase-auth-ktx"
     const val hilt_android =
@@ -163,6 +165,8 @@ object Libs {
         "androidx.room:room-ktx:$room_version"
     const val room_runtime =
         "androidx.room:room-runtime:$room_version"
+    const val tracing =
+        "androidx.tracing:tracing:$tracing_version"
     const val ui_tooling_preview =
         "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
 
@@ -177,7 +181,7 @@ object TestLibs {
     const val arch_core =
         "androidx.arch.core:core-testing:$core_testing_version"
     const val arch_core_ktx =
-        "androidx.test:core-ktx:$androidx_text_core_version"
+        "androidx.test:core-ktx:$androidx_test_core_version"
     const val compose_ui_test_junit =
         "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
     const val espresso_core =
@@ -194,6 +198,8 @@ object TestLibs {
         "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     const val mockk =
         "io.mockk:mockk:$mockk_version"
+    const val mockk_android =
+        "io.mockk:mockk-android:$mockk_version"
     const val mockk_agent_jvm =
         "io.mockk:mockk-agent-jvm:$mockk_version"
     const val room =

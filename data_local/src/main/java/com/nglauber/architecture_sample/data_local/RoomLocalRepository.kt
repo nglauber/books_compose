@@ -11,15 +11,16 @@ import com.nglauber.architecture_sample.domain.repositories.BooksRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import java.util.*
+import java.util.UUID
 import javax.inject.Inject
 
 class RoomLocalRepository @Inject constructor(
     @ApplicationContext context: Context,
-    private val fileHelper: FileHelper
+    private val fileHelper: FileHelper,
+    inMemory: Boolean = false,
 ) : BooksRepository {
 
-    private val db = AppDatabase.getDatabase(context.applicationContext)
+    private val db = AppDatabase.getDatabase(context.applicationContext, inMemory)
     private val bookDao = db.bookDao()
 
     override fun saveBook(book: Book): Flow<ResultState<Unit>> {

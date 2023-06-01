@@ -9,7 +9,6 @@ android {
 
     defaultConfig {
         minSdk = Apps.min_sdk_version
-        targetSdk = Apps.target_sdk_version
         testInstrumentationRunner = Apps.test_instrumentation_runner
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -50,7 +49,7 @@ dependencies {
 
     debugImplementation(Libs.ui_tooling)
     debugImplementation(Libs.ui_test_manifest)
-
+    implementation(Libs.tracing)
     androidTestImplementation(TestLibs.ext_junit)
     androidTestImplementation(TestLibs.espresso_core)
     androidTestImplementation(TestLibs.compose_ui_test_junit)

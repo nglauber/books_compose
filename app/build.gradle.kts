@@ -17,7 +17,6 @@ android {
         versionCode = Apps.version_code
         versionName = Apps.version_name
 
-        testInstrumentationRunner = Apps.test_instrumentation_runner
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -42,7 +41,7 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = Versions.kotlin_compiler_ext_version
     }
-    packagingOptions {
+    packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }

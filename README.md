@@ -138,6 +138,17 @@ fun providesBookRepository(
 
 And that's it! You're good to go.
 
+## Running the tests
+```
+./gradlew clean
+./gradlew test connectedAndroidTest
+```
+
+## Checking new versions of dependency libraries
+```
+./gradlew dependencyUpdates
+```
+
 ## Contribute ;)
 
 This project is just a sample, but any feedback and/or PR's are really appreciated! :)

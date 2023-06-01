@@ -39,9 +39,8 @@ dependencies {
     implementation(Libs.kotlinx_coroutines_core)
 
     implementation(platform(Libs.firebase_bom))
-    implementation(Libs.firebase_core)
     implementation(Libs.firebase_firestore)
     implementation(Libs.firebase_storage)
-    implementation(Libs.firebase_auth)
+    implementation(Libs.firebase_auth_ktx)
     implementation(Libs.exif_interface)
 }

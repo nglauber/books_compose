@@ -11,7 +11,6 @@ android {
 
     defaultConfig {
         minSdk = Apps.min_sdk_version
-        targetSdk = Apps.target_sdk_version
         testInstrumentationRunner = Apps.test_instrumentation_runner
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -36,6 +35,13 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion = Versions.kotlin_compiler_ext_version
+    }
+    packaging {
+        resources {
+            excludes += "/META-INF/com.google.dagger_dagger.version"
+            excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/LICENSE-notice.md"
+        }
     }
 }
 
@@ -64,12 +70,13 @@ dependencies {
     androidTestImplementation(TestLibs.ext_junit)
     androidTestImplementation(TestLibs.espresso_core)
     androidTestImplementation(TestLibs.compose_ui_test_junit)
+    androidTestImplementation(TestLibs.mockk)
+    androidTestImplementation(TestLibs.mockk_android)
+    androidTestImplementation(TestLibs.kotlin_coroutines_test)
 
-    testImplementation(TestLibs.junit)
-    testImplementation(TestLibs.kotlin_coroutines_test)
-    testImplementation(TestLibs.ext_junit_ktx)
-    testImplementation(TestLibs.arch_core_ktx)
-    testImplementation(TestLibs.kotlin_reflect)
-    testImplementation(TestLibs.mockk)
-    testImplementation(TestLibs.mockk_agent_jvm)
+    androidTestImplementation(TestLibs.junit)
+    androidTestImplementation(TestLibs.ext_junit_ktx)
+    androidTestImplementation(TestLibs.arch_core_ktx)
+    androidTestImplementation(TestLibs.kotlin_reflect)
+    androidTestImplementation(TestLibs.mockk_agent_jvm)
 }

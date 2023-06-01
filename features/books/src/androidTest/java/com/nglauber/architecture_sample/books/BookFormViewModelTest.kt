@@ -68,7 +68,7 @@ class BookFormViewModelTest {
     }
 
     @Test
-    fun `updating fields update book`() = runTest {
+    fun updating_fields_update_book() = runTest {
         // Given
         val viewModel = BookFormViewModel(useCase, filePicker, null)
         val initialBook: Book = viewModel.currentBook!!
@@ -126,7 +126,7 @@ class BookFormViewModelTest {
     }
 
     @Test
-    fun `insert a book successfully`() = runTest {
+    fun insert_a_book_successfully() = runTest {
         // Given
         val viewModel = BookFormViewModel(useCase, filePicker, null)
         val dummyBook = viewModel.currentBook

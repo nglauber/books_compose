@@ -11,8 +11,6 @@ android {
 
     defaultConfig {
         minSdk = Apps.min_sdk_version
-        targetSdk = Apps.target_sdk_version
-        testInstrumentationRunner = Apps.test_instrumentation_runner
         consumerProguardFiles("consumer-rules.pro")
     }
     buildTypes {
@@ -54,7 +52,6 @@ dependencies {
     kapt(Libs.hilt_android_compiler)
 
     implementation(platform(Libs.firebase_bom))
-    implementation(Libs.firebase_core)
     implementation(Libs.firebase_auth_ktx)
     implementation(Libs.play_services_auth)
 }

@@ -53,7 +53,7 @@ class BookListViewModelTest {
     }
 
     @Test
-    fun `loading books successfully`() = runTest {
+    fun loading_books_successfully() = runTest {
         // Given
         val states = mutableListOf<ResultState<List<Book>>>()
         val viewModel = BookListViewModel(useCase, authUseCase)
@@ -77,7 +77,7 @@ class BookListViewModelTest {
     }
 
     @Test
-    fun `removing a book successfully`() = runTest {
+    fun removing_a_book_successfully() = runTest {
         // Given
         val firstBook = dummyBookList.first()
         val viewModel = BookListViewModel(useCase, authUseCase)
